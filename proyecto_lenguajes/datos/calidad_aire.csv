@@ -1,0 +1,16 @@
+id_muestra,fecha,estacion,zona,pm25,pm10,temperatura,humedad
+1,2026-03-01,Estacion_Centro,Centro,42.5,65.0,18.5,72
+2,2026-03-01,Estacion_Norte,Norte,28.0,45.2,19.0,68
+3,2026-03-01,Estacion_Sur,Sur,55.8,85.1,17.8,75
+4,2026-03-01,Estacion_Occidente,Occidente,33.2,52.0,18.2,70
+5,2026-03-02,Estacion_Centro,Centro,48.1,72.4,19.1,65
+6,2026-03-02,Estacion_Norte,Norte,24.5,39.8,20.0,63
+7,2026-03-02,Estacion_Sur,Sur,62.3,94.0,18.0,78
+8,2026-03-02,Estacion_Occidente,Occidente,30.5,,18.8,69
+9,2026-03-03,Estacion_Centro,Centro,51.0,78.2,17.5,80
+10,2026-03-03,Estacion_Norte,Norte,22.0,35.0,18.9,71
+11,2026-03-03,Estacion_Sur,Sur,58.4,88.7,17.2,82
+12,2026-03-03,Estacion_Occidente,Occidente,35.0,54.1,18.0,74
+13,2026-03-04,Estacion_Centro,Centro,-5.0,70.0,18.0,70
+14,2026-03-04,Estacion_Norte,Norte,26.4,41.0,19.5,66
+15,2026-03-04,Estacion_Sur,Sur,60.1,91.5,17.4,79
