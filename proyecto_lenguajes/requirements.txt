@@ -1,8 +1,0 @@
-# =============================================================================
-# Dependencias mínimas del proyecto Arcanum
-# NO UTILIZA PANDAS, NUMPY NI NINGUNA LIBRERÍA DE CIENCIA DE DATOS EXTERNA.
-# Todo el procesamiento tabular, filtrado, ordenamiento y estadísticas fue
-# implementado 100% desde cero en Python nativo (src/pocion.py).
-# =============================================================================
-antlr4-python3-runtime>=4.13.0
-pytest>=7.0.0
