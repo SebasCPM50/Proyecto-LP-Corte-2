@@ -5,7 +5,7 @@ echo "PROYECTO ARCANUM (SEGUNDO CORTE EN UBUNTU)"
 echo
 
 # 1 Pruebas automáticas con pytest
-echo ">>> [1/5] Ejecutando suite de 24 pruebas automáticas"
+echo ">>> [1/5] Ejecutando suite de 28 pruebas automáticas"
 python3 -m pytest -v tests
 echo
 
