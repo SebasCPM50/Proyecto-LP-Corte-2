@@ -199,3 +199,176 @@ Dijo que era *"para las predicciones"*, y el profesor le gritó: *"¡Nooo! Eso n
    Muéstrale `src/pocion.py` líneas de `_generar_siguiente_azar()` y `numero_aleatorio()`, o ejecuta `examples/ejemplo4_compendios_recetas.arc`.
 6. **Si te altera el CSV:**
    No te pongas nervioso. Guárdalo y dale a la flecha arriba en la terminal para reejecutar. Arcanum lo procesará perfecto.
+
+
+---
+
+## 5. EXPLICACIÓN LÍNEA POR LÍNEA DE CADA CÓDIGO Y SUS MÉTODOS
+
+Aquí tienes el desglose exacto de cada archivo y de cada método para que, si el profesor señala la pantalla y te pregunta *"¿Qué hace esta línea?"*, respondas con total seguridad.
+
+---
+
+### ARCHIVO 1: `src/pocion.py` (Estructura Tabular Artesanal)
+Es el archivo más importante de todo el proyecto. Reemplaza a Pandas y NumPy desde cero.
+
+#### Funciones auxiliares fuera de la clase:
+* **`_convertir_tipo_dato(texto)`**:
+  * **Qué hace:** Recibe el texto crudo de una celda del CSV y descubre qué tipo de dato es para convertirlo.
+  * **Cómo funciona por dentro:** Limpia espacios con `.strip()`. Si está vacío o dice `"NAN"`, devuelve `None`. Si dice `"verdadero"` o `"true"`, devuelve `True`. Si dice `"falso"`, devuelve `False`. Luego intenta hacer `int(texto)`; si falla, intenta hacer `float(texto)`; y si tiene comillas a los lados, se las quita con `texto[1:-1]` y lo deja como cadena limpia.
+  * **Qué decirle al profesor:** *"Es nuestro analizador léxico de celdas. Infiere dinámicamente si el dato es entero, flotante, booleano, texto o nulo sin usar librerías externas"*.
+* **`_generar_siguiente_azar()`**:
+  * **Qué hace:** Genera un número pseudoaleatorio utilizando un algoritmo congruencial lineal (LCG).
+  * **Cómo funciona por dentro:** Aplica la fórmula matemática entera $X_{n+1} = (X_n \cdot 1103515245 + 12345) \pmod{2^{31}}$. La semilla se inicializa mezclando el `id()` de un objeto con el `os.getpid()` del proceso para que nunca empiece con el mismo valor.
+  * **Qué decirle al profesor:** *"Es el algoritmo de Lehmer / Congruencial Lineal programado a mano para generar números al azar sin usar `import random`"*.
+* **`numero_aleatorio(minimo=0, maximo=1)`**:
+  * **Qué hace:** Devuelve un número al azar dentro del rango que le pidan.
+  * **Cómo funciona por dentro:** Divide el azar crudo entre $2147483647.0$ para obtener un decimal entre 0 y 1. Si los argumentos son enteros (ej. `random(1, 6)`), calcula el rango `(maximo - minimo) + 1` y devuelve un entero. Si no le pasan nada, devuelve un flotante redondeado a 4 decimales.
+
+#### Métodos de la clase `Pocion`:
+* **`__init__(self, columnas, filas)`**:
+  * **Qué hace:** Constructor de la tabla de datos.
+  * **Cómo funciona por dentro:** Guarda la lista de columnas en `self.columnas`. En `self.filas` guarda copias independientes de cada diccionario (`[dict(f) for f in filas]`) para garantizar la inmutabilidad y evitar que cambios posteriores afecten a otras pociones.
+* **`resolver_ruta(cls, ruta)`**:
+  * **Qué hace:** Método de clase que busca inteligentemente el archivo CSV si el usuario escribió una ruta relativa (busca en la carpeta actual, en `csv/`, en `datos/` o en `../csv/`).
+* **`desde_csv(cls, ruta)`**:
+  * **Qué hace:** Carga un archivo CSV desde el disco a la memoria.
+  * **Cómo funciona por dentro:** Abre el archivo con `open(ruta, mode='r', encoding='utf-8')`. Lee las líneas con `.readlines()`. La primera línea la corta por comas con `.split(',')` para obtener las columnas. Para cada una de las líneas siguientes, corta por comas, pasa cada celda por `_convertir_tipo_dato()` y arma un diccionario clave-valor. Devuelve una instancia nueva de `Pocion(cabecera, filas)`.
+* **`a_csv(self, ruta)`**:
+  * **Qué hace:** Guarda la poción actual en un archivo CSV en disco.
+  * **Cómo funciona por dentro:** Abre el archivo destino en modo escritura (`mode='w'`). Escribe primero las columnas separadas por coma (`",".join(self.columnas) + "\n"`). Luego recorre `self.filas` y escribe cada registro convirtiendo `None` en texto vacío.
+* **`recolectar(self, lista_columnas)`**:
+  * **Qué hace:** Proyección (selecciona columnas).
+  * **Cómo funciona por dentro:** Recorre las filas y construye diccionarios nuevos que contienen únicamente las claves que están en `lista_columnas`. Devuelve una nueva `Pocion` con esas columnas.
+* **`purificar(self, evaluador_condicion)`**:
+  * **Qué hace:** Filtra las filas de la tabla según un predicado lógico.
+  * **Cómo funciona por dentro:** Itera con `for fila in self.filas` y le pasa cada fila a la función booleana `evaluador_condicion(f)`. Solo las filas que dan `True` pasan a la nueva `Pocion`.
+* **`ordenar(self, columna, ascendente=True)`**:
+  * **Qué hace:** Ordena los registros según el valor de una columna.
+  * **Cómo funciona por dentro:** Usa la función nativa `sorted()` con una función clave `clave_orden(fila)`. Si el valor es `None`, devuelve `(1, 0)`; si no, devuelve `(0, v)`. Esta técnica garantiza que los valores nulos siempre queden al final de forma segura sin generar errores de tipo entre números y `None`.
+* **`transmutar(self, nombre_columna, evaluador_expresion)`**:
+  * **Qué hace:** Agrega una columna calculada fila por fila.
+  * **Cómo funciona por dentro:** Agrega `nombre_columna` a la lista de columnas. Luego recorre cada fila, calcula el nuevo valor evaluando la fórmula matemática sobre esa fila con `evaluador_expresion(fila)`, y guarda el resultado bajo la nueva clave del diccionario.
+* **`sanar_descartar_nulos(self)`**:
+  * **Qué hace:** Limpia la tabla descartando filas incompletas.
+  * **Cómo funciona por dentro:** Revisa cada fila con `any(fila.get(c) is None for c in self.columnas)`. Si ninguna celda es `None`, la fila se conserva.
+* **`sanar_llenar_nulos(self, columna, valor_relleno)`**:
+  * **Qué hace:** Imputa valores por defecto en celdas vacías de una columna.
+  * **Cómo funciona por dentro:** Recorre las filas y, si `fila.get(columna) is None`, le asigna `valor_relleno`.
+* **`destilar(self, columnas_grupo, lista_agregaciones)`**:
+  * **Qué hace:** Agrupamiento y agregación estadística (equivalente a `GROUP BY`).
+  * **Cómo funciona por dentro:** Usa una tabla hash (`grupos = {}`) donde la clave es una tupla con los valores agrupadores `tuple(fila.get(col) for col in columnas_grupo)`. Clasifica todas las filas en sus grupos en una sola pasada $\mathcal{O}(N)$. Luego recorre cada grupo y calcula matemáticamente las agregaciones solicitadas (`suma`, `media`, `mediana`, `desviacion`, `minimo`, `maximo`, `contar`).
+* **`describir(self)`**:
+  * **Qué hace:** Genera la tabla resumen de estadísticas descriptivas.
+  * **Cómo funciona por dentro:** Detecta cuáles columnas contienen números. Luego calcula para cada una de ellas: conteo, media, desviación estándar muestral ($\sqrt{\frac{\sum (x - \bar{x})^2}{n - 1}}$), mínimo y máximo. Devuelve una nueva Poción con las métricas en filas.
+* **`mostrar(self)`**:
+  * **Qué hace:** Imprime la tabla completa en consola alineada y sin recortar registros.
+  * **Cómo funciona por dentro:** Mide el texto más largo de cada columna (`max_len`) para calcular el ancho de separación (`ljust(anchos[col])`). Muestra los valores `None` explícitamente para que el usuario vea dónde faltan datos.
+* **`muestra_aleatoria(self, cantidad)`**:
+  * **Qué hace:** Extrae un subconjunto de filas al azar sin reemplazo.
+  * **Cómo funciona por dentro:** Aplica el algoritmo de mezcla de Fisher-Yates sobre los índices de la tabla usando `_generar_siguiente_azar()` y devuelve una nueva `Pocion` con las filas mezcladas.
+
+---
+
+### ARCHIVO 2: `src/tabla_simbolos.py` (Memoria del Compilador)
+Maneja las variables, sus tipos semánticos y valida que las operaciones tengan sentido.
+
+* **`class Simbolo`**:
+  * **Qué hace:** Modela una variable individual.
+  * **Atributos:** `nombre` (ej. `"ventas"`), `tipo` (`"POCION"`, `"NUMERO"`, `"CADENA"`, `"BOOLEANO"`), `valor` (el objeto real en memoria), `linea` y `columna` (dónde se creó en el archivo `.arc`).
+* **`TablaSimbolos.__init__(self)`**:
+  * Inicializa el diccionario `self._simbolos = {}` que almacena los pares `nombre: Simbolo`.
+* **`definir(self, nombre, valor, ...)`**:
+  * Si no le indican el tipo, llama a `determinar_tipo(valor)` y guarda el `Simbolo` en el diccionario.
+* **`determinar_tipo(self, valor)`**:
+  * Comprueba si el valor es instancia de `Pocion` $\rightarrow$ `"POCION"`, `bool` $\rightarrow$ `"BOOLEANO"`, `int/float` $\rightarrow$ `"NUMERO"`, `str` $\rightarrow$ `"CADENA"`.
+* **`obtener(self, nombre, linea, columna)`**:
+  * Busca la variable en el diccionario. Si no existe, lanza inmediatamente un `ErrorSemantico` informando la línea y columna exactas.
+* **`obtener_pocion(self, nombre, linea, columna)`**:
+  * Recupera la variable y además comprueba que `simbolo.tipo == "POCION"`. Si alguien intenta aplicar una operación tabular sobre un número, lanza un error de tipos.
+* **`verificar_columna(self, nombre_pocion, nombre_columna, ...)`**:
+  * Comprueba que `nombre_columna` esté dentro de `pocion.columnas`. Si no existe, detiene la ejecución y le muestra al usuario la lista de columnas que sí están disponibles.
+* **`imprimir(self)`**:
+  * Imprime en pantalla el estado final de todas las variables que quedaron en memoria al terminar la ejecución.
+
+---
+
+### ARCHIVO 3: `src/errores.py` (Gestión de Fallas)
+
+* **`class ErrorSemantico(Exception)`**:
+  * Excepción personalizada de Python que almacena el mensaje de error, la línea y la columna. Su método `__str__` formatea el texto en español claro: `[Error Semántico] Línea X, Columna Y: mensaje`.
+* **`class ManejadorErrores(ErrorListener)`**:
+  * Hereda de la clase `ErrorListener` de ANTLR. Intercepta los errores sintácticos y léxicos antes de que ANTLR tire textos feos en inglés. Traduce mensajes como `"mismatched input"` a `"Token inesperado"` e `"extraneous input"` a `"Elemento sobrante"`.
+
+---
+
+### ARCHIVO 4: `src/motor.py` (Fachada de Procesamiento)
+
+* **`class MotorDatos`**:
+  * Aplica el patrón de diseño **Fachada (Facade)**. Agrupa métodos estáticos (`cargar_csv`, `recolectar`, `purificar`, `ordenar`, `transmutar`, `sanar_descartar_nulos`, `destilar`, `describir`, `azar`, `muestra_aleatoria`) y redirige cada llamada al método correspondiente de `Pocion`. Permite que el Visitor no dependa directamente de los detalles internos de la clase `Pocion`.
+
+---
+
+### ARCHIVO 5: `src/visitor.py` (Intérprete Semántico - Patrón Visitor)
+Es el motor de ejecución. Recorre cada nodo del árbol de análisis sintáctico (AST) generado por ANTLR.
+
+* **`class RecetaAlquimica`**:
+  * Guarda la definición de una función propia: su nombre, su lista de parámetros, las instrucciones (`hechizos`) que contiene y la expresión de retorno (`devolver`).
+* **`ArcanumVisitorEjecutor.__init__(self, tabla_simbolos)`**:
+  * Inicializa la tabla de símbolos, `self._fila_activa = None` (guarda la fila que se está evaluando en filtros o transmutaciones), `self._recetas_locales` (funciones del script actual), `self._compendios` (librerías cargadas) y `self._marcos_locales = []` (pila de llamadas para variables locales).
+* **`visitPrograma` / `visitHechizo`**:
+  * Recorren secuencialmente cada instrucción del script.
+* **`visitAsignacion`**:
+  * Evalúa la expresión a la derecha del `=` y guarda el resultado. Si estamos dentro de una receta, lo guarda en el marco local actual (`self._marcos_locales[-1]`); si estamos en el programa principal, lo guarda en la `TablaSimbolos` global.
+* **`visitInvocarExpr`**:
+  * Extrae la ruta entre comillas y llama a `MotorDatos.cargar_csv()`.
+* **`visitRecolectarExpr`**:
+  * Valida que las columnas pedidas existan con `tabla.verificar_columnas()` y llama a `MotorDatos.recolectar()`.
+* **`visitPurificarExpr`**:
+  * Define la función `evaluador_condicion_fila(fila)`: activa temporalmente `self._fila_activa = fila`, visita el subárbol de la condición y restaura la fila anterior. Llama a `MotorDatos.purificar()`.
+* **`visitOrdenarExpr`**:
+  * Valida la columna, revisa si dice `asc` o `desc`, y llama a `MotorDatos.ordenar()`.
+* **`visitTransmutarExpr`**:
+  * Activa la fila actual en `self._fila_activa`, evalúa la expresión aritmética para esa fila y llama a `MotorDatos.transmutar()`.
+* **`visitSanarExpr`**:
+  * Si la orden es `descartar_nulos`, llama a `sanar_descartar_nulos()`. Si es `llenar`, evalúa el valor de relleno y llama a `sanar_llenar_nulos()`.
+* **`visitDestilarExpr`**:
+  * Extrae las columnas agrupadoras y la lista de funciones agregadas (`suma`, `media`, etc.). Llama a `MotorDatos.destilar()`.
+* **`visitInstruccionRevelar` y `visitInstruccionDescribir`**:
+  * Obtienen la poción de la tabla de símbolos y llaman a `.mostrar()`.
+* **`visitInstruccionPreservar`**:
+  * Llama a `MotorDatos.guardar_csv()` para exportar los datos al archivo CSV indicado.
+* **`visitInstruccionUsar`**:
+  * Abre el archivo del compendio en `compendios/<nombre>.arc`, lo parsea con ANTLR en un subárbol independiente y guarda sus recetas en `self._compendios[nombre]`.
+* **`visitDefinicionReceta`**:
+  * Registra la función en `self._recetas_locales`.
+* **`visitLlamadaReceta`**:
+  * Resuelve la llamada a una función:
+    1. Si es llamada calificada (`compendio.receta`), la busca en `self._compendios`.
+    2. Si es llamada simple, la busca en `self._recetas_locales`, luego en compendios.
+    3. Si no existe pero se llama `random`, `aleatorio` o `azar`, ejecuta la función de azar nativa del lenguaje.
+    4. Crea un marco de variables locales con `dict(zip(parametros, argumentos))` y lo empuja a la pila (`self._marcos_locales.append()`).
+    5. Ejecuta las instrucciones de la receta y retorna el resultado de `devolver`.
+    6. Al finalizar, saca el marco de la pila con `self._marcos_locales.pop()` para aislar la memoria.
+* **`visitIdentificador`**:
+  * Resuelve el valor de una variable buscando en orden de alcance (scoping):
+    1. En los parámetros o variables locales de la receta actual.
+    2. En los nombres de columna de la fila activa (`self._fila_activa`) si estamos dentro de un filtro o transmutación.
+    3. En la tabla de símbolos global.
+    4. Si no la encuentra en ningún lado, lanza un `ErrorSemantico`.
+
+---
+
+### ARCHIVO 6: `src/main.py` (Punto de Entrada CLI)
+
+* **`imprimir_arbol(nodo, parser, sangria=0)`**:
+  * Función recursiva que recorre el árbol sintáctico generado por ANTLR e imprime los nombres de las reglas y los tokens terminales con sangrías si se pasa la bandera `--arbol`.
+* **`ejecutar(ruta_archivo, mostrar_arbol=False)`**:
+  * Coordina las fases del compilador:
+    1. Lee el archivo fuente con `FileStream`.
+    2. Ejecuta el `ArcanumLexer` para separar en tokens.
+    3. Ejecuta el `ArcanumParser` para construir el árbol de sintaxis.
+    4. Si hay errores léxicos o sintácticos, los imprime y se detiene.
+    5. Si el análisis sintáctico es correcto, crea la `TablaSimbolos` y el `ArcanumVisitorEjecutor`.
+    6. Llama a `visitor.visit(arbol)` para ejecutar el programa.
+    7. Captura cualquier `ErrorSemantico` y lo muestra limpiamente en consola.
