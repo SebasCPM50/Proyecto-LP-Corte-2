@@ -1,10 +1,8 @@
 """
-Módulo de Tabla de Símbolos — Arcanum
-La Tabla de Símbolos es la libreta de memoria del intérprete
-Guarda los nombres de todas las variables, sus tipos y sus valores actuales
-
-100% LIBRE DE LIBRERÍAS EXTERNAS:
-Utiliza nuestra propia clase Pocion para las estructuras tabulares
+Módulo de la Tabla de Símbolos para Arcanum
+Es como la memoria del programa donde guardamos los nombres de las variables,
+qué tipo de dato tienen y el valor que llevan guardado
+Todo hecho con diccionarios de Python sin usar librerías raras
 """
 
 from errores import ErrorSemantico
@@ -13,16 +11,22 @@ from pocion import Pocion
 
 class Simbolo:
     """
-    Representa una variable individual en la memoria de Arcanum
+    Representa una sola variable guardada en memoria
+    Guarda su nombre, su tipo, el valor real y en qué línea del archivo se creó
     """
     def __init__(self, nombre, tipo, valor, linea=None, columna=None):
-        self.nombre = nombre       # Nombre de la variable
-        self.tipo = tipo           # 'POCION', 'NUMERO', 'CADENA', 'BOOLEANO'
-        self.valor = valor         # El valor real
-        self.linea = linea         # Línea donde se definió
-        self.columna = columna     # Columna donde se definió
+        # Acá guardamos el nombre de la variable como 'ventas' o 'x'
+        self.nombre = nombre
+        # Acá guardamos si es 'POCION', 'NUMERO', 'CADENA' o 'BOOLEANO'
+        self.tipo = tipo
+        # Acá guardamos el dato real, por ejemplo el objeto Pocion o el número
+        self.valor = valor
+        # Guardamos la línea y columna para saber de dónde salió
+        self.linea = linea
+        self.columna = columna
 
     def __repr__(self):
+        # Texto bonito para cuando queramos ver qué tiene la variable
         if self.tipo == "POCION":
             filas = len(self.valor)
             cols = self.valor.columnas
@@ -32,26 +36,25 @@ class Simbolo:
 
 class TablaSimbolos:
     """
-    Gestiona el almacenamiento y validación semántica de todas las variables
+    Acá manejamos el diccionario con todas las variables del programa
+    Nos sirve para revisar que nadie use variables inventadas o tipos incompatibles
     """
     def __init__(self):
-        # Diccionario principal: clave = nombre_variable, valor = objeto Simbolo
+        # Este diccionario guarda: clave = nombre de la variable, valor = objeto Simbolo
         self._simbolos = {}
 
     def definir(self, nombre, valor, tipo_sugerido=None, linea=None, columna=None):
-        """
-        Registra o actualiza una variable en la tabla de símbolos
-        Deduce el tipo automáticamente si no se especifica
-        """
+        # Si no nos dijeron el tipo, lo descubrimos nosotros mismos mirando el valor
         if tipo_sugerido is None:
             tipo_sugerido = self.determinar_tipo(valor)
 
+        # Creamos el símbolo y lo metemos en el diccionario para no perderlo
         simbolo = Simbolo(nombre, tipo_sugerido, valor, linea, columna)
         self._simbolos[nombre] = simbolo
         return simbolo
 
     def determinar_tipo(self, valor):
-        # Identifica el tipo semántico de Arcanum según el valor de Python
+        # Mira qué cosa es en Python y le asigna el nombre alquímico correspondiente
         if isinstance(valor, Pocion):
             return "POCION"
         elif isinstance(valor, bool):
@@ -63,14 +66,11 @@ class TablaSimbolos:
         return "DESCONOCIDO"
 
     def existe(self, nombre):
-        # Verifica si una variable existe en la tabla
+        # Nos dice True si la variable ya fue creada antes en la memoria
         return nombre in self._simbolos
 
     def obtener(self, nombre, linea=None, columna=None):
-        """
-        Recupera el símbolo de la tabla
-        Si no existe, lanza un ErrorSemantico claro
-        """
+        # Busca la variable en el diccionario, y si no está tira un error semántico claro
         if nombre not in self._simbolos:
             raise ErrorSemantico(
                 f"La variable o poción '{nombre}' no ha sido declarada o invocada previamente",
@@ -79,14 +79,12 @@ class TablaSimbolos:
         return self._simbolos[nombre]
 
     def obtener_valor(self, nombre, linea=None, columna=None):
-        # Recupera el valor directo de una variable
+        # Saca directo el valor que tiene adentro la variable
         return self.obtener(nombre, linea, columna).valor
 
     def obtener_pocion(self, nombre, linea=None, columna=None):
-        """
-        Recupera una variable verificando que sea de tipo POCION
-        Si es de otro tipo, lanza un error semántico explicativo
-        """
+        # Busca la variable pero además revisa que sí sea una Poción (tabla de datos)
+        # Si alguien intenta hacer operaciones de tabla sobre un número, acá lo frena
         simbolo = self.obtener(nombre, linea, columna)
         if simbolo.tipo != "POCION" or not isinstance(simbolo.valor, Pocion):
             raise ErrorSemantico(
@@ -96,10 +94,8 @@ class TablaSimbolos:
         return simbolo.valor
 
     def verificar_columna(self, nombre_pocion, nombre_columna, linea=None, columna=None):
-        """
-        Verifica que una columna exista dentro de una poción
-        Si no existe, informa el error y lista las columnas disponibles
-        """
+        # Revisa que la columna que piden sí exista dentro de la tabla
+        # Si no existe, le avisa al usuario cuáles sí están disponibles
         pocion = self.obtener_pocion(nombre_pocion, linea, columna)
         if nombre_columna not in pocion.columnas:
             columnas_disponibles = list(pocion.columnas)
@@ -110,19 +106,20 @@ class TablaSimbolos:
         return True
 
     def verificar_columnas(self, nombre_pocion, lista_columnas, linea=None, columna=None):
+        # Hace la misma revisión pero para una lista completa de columnas
         for col in lista_columnas:
             self.verificar_columna(nombre_pocion, col, linea, columna)
 
     def limpiar(self):
+        # Borra todo lo que tengamos en memoria
         self._simbolos.clear()
 
     def listar_simbolos(self):
+        # Devuelve la lista con todos los símbolos que existen
         return list(self._simbolos.values())
 
     def imprimir(self):
-        """
-        Imprime la tabla de símbolos de forma limpia sin líneas de guiones
-        """
+        # Muestra en la terminal qué variables quedaron guardadas al final de la corrida
         print()
         print("[ESTADO DE LA TABLA DE SÍMBOLOS]")
         if not self._simbolos:

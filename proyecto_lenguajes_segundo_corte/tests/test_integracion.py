@@ -1,9 +1,7 @@
 """
-Pruebas de Integración — Arcanum
-================================
-Verifica la ejecución de punta a punta de los programas completos (.arc)
-y la correcta generación y exportación de archivos CSV resultantes.
-100% LIBRE DE LIBRERÍAS EXTERNAS.
+Pruebas de integración para Arcanum
+Acá corremos los programas completos de punta a punta y revisamos que
+los archivos CSV que se guardan en la carpeta salidas/ queden bien escritos
 """
 
 import os
@@ -18,16 +16,20 @@ from pocion import Pocion
 
 
 class TestIntegracionProgramas:
+    """Acá probamos que los ejemplos reales de Arcanum corran completos sin fallar"""
 
     def test_ejecutar_valido_asignaciones(self):
+        # Corre el ejemplo de variables básicas
         ruta = os.path.join("examples", "valido_asignaciones.arc")
         assert ejecutar(ruta) is True
 
     def test_ejecutar_valido_completo(self):
+        # Corre el ejemplo con todas las operaciones
         ruta = os.path.join("examples", "valido_completo.arc")
         assert ejecutar(ruta) is True
 
     def test_ejecutar_programa1_ventas_y_verificar_csv(self):
+        # Corre el caso de ventas y revisa que el archivo CSV se haya guardado
         ruta = os.path.join("examples", "ejemplo1_analisis_ventas.arc")
         assert ejecutar(ruta) is True
 
@@ -41,6 +43,7 @@ class TestIntegracionProgramas:
         assert "ingreso_total" in pocion_exportada.columnas
 
     def test_ejecutar_programa2_estudiantes_y_verificar_csv(self):
+        # Corre el caso de estudiantes y revisa el CSV exportado
         ruta = os.path.join("examples", "ejemplo2_rendimiento_estudiantil.arc")
         assert ejecutar(ruta) is True
 
@@ -53,6 +56,7 @@ class TestIntegracionProgramas:
         assert "promedio_general" in pocion_exportada.columnas
 
     def test_ejecutar_programa3_calidad_aire_y_verificar_csv(self):
+        # Corre el caso ambiental y revisa las columnas exportadas
         ruta = os.path.join("examples", "ejemplo3_calidad_aire.arc")
         assert ejecutar(ruta) is True
 
