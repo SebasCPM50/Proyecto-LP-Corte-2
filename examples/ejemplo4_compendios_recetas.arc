@@ -9,11 +9,16 @@ receta comision_vendedor(monto, tasa) {
     devolver comision;
 }
 
-# 3 Probamos las funciones de la librería propia
+# 3 Probamos las funciones de la librería propia y la función random nativa
 subtotal_ejemplo = 100000;
 iva = matematicas.calcular_iva(subtotal_ejemplo, 0.19);
 precio_rebajado = matematicas.aplicar_descuento(subtotal_ejemplo, 0.15);
 mi_comision = comision_vendedor(subtotal_ejemplo, 0.05);
+
+# Demostración de aleatoriedad artesanal nativa
+dado_al_azar = random(1, 6);
+porcentaje_azar = random(1, 100);
+decimal_azar = random();
 
 # 4 Invocamos datos y usamos operaciones alquímicas
 ventas = invocar desde "csv/ventas.csv";

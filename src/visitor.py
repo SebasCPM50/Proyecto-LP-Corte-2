@@ -366,18 +366,11 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
         else:
             # O si la llamaron directo por su nombre
             receta_nom = ids[0].getText()
-            if receta_nom in self._recetas_locales:
-                receta = self._recetas_locales[receta_nom]
-            else:
-                encontrada = None
-                for c_nom, c_dict in self._compendios.items():
-                    if receta_nom in c_dict:
-                        encontrada = c_dict[receta_nom]
-                        break
-                if encontrada:
-                    receta = encontrada
-                elif receta_nom.lower() in ["random", "aleatorio", "azar"]:
-                    # Acá resolvemos la función random nativa del lenguaje hecha a mano
+            
+            # Prioridad 1: Funciones nativas del lenguaje (random / aleatorio / azar) con 0, 1 o 2 argumentos
+            if receta_nom.lower() in ["random", "aleatorio", "azar"]:
+                num_args = len(ctx.listaArgumentos().expresion()) if ctx.listaArgumentos() else 0
+                if num_args <= 2:
                     argumentos = []
                     if ctx.listaArgumentos():
                         for expr_arg in ctx.listaArgumentos().expresion():
@@ -389,8 +382,19 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
                         return numero_aleatorio(0, argumentos[0])
                     elif len(argumentos) == 2:
                         return numero_aleatorio(argumentos[0], argumentos[1])
-                    else:
-                        raise ErrorSemantico("La función random espera máximo 2 argumentos (minimo, maximo)", linea, columna)
+
+            if receta_nom in self._recetas_locales:
+                receta = self._recetas_locales[receta_nom]
+            else:
+                encontrada = None
+                for c_nom, c_dict in self._compendios.items():
+                    if receta_nom in c_dict:
+                        encontrada = c_dict[receta_nom]
+                        break
+                if encontrada:
+                    receta = encontrada
+                elif receta_nom.lower() in ["random", "aleatorio", "azar"]:
+                    raise ErrorSemantico("La función random espera máximo 2 argumentos (minimo, maximo)", linea, columna)
                 else:
                     raise ErrorSemantico(f"La receta o función '{receta_nom}' no ha sido definida", linea, columna)
 
