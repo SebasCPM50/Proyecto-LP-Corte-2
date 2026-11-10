@@ -12,6 +12,7 @@ Regla importante:
 """
 
 import os
+import json
 from errores import ErrorSemantico
 
 
@@ -121,6 +122,10 @@ class Pocion:
         Lee un archivo CSV desde cero usando open() y split() nativos de Python
         No usa el módulo csv de Python ni Pandas
         """
+        # Si la ruta termina en .json, delegamos directamente a la lectura JSON
+        if ruta.strip().lower().endswith(".json"):
+            return cls.desde_json(ruta, linea, columna)
+
         # Primero buscamos en qué carpeta está el archivo
         ruta_resuelta = cls.resolver_ruta(ruta)
         if not os.path.exists(ruta_resuelta):
@@ -161,13 +166,86 @@ class Pocion:
             return cls(cabecera, filas)
 
         except Exception as e:
+            if isinstance(e, ErrorSemantico):
+                raise e
             raise ErrorSemantico(f"Error al leer el archivo CSV '{ruta}': {str(e)}", linea, columna)
+
+    @classmethod
+    def desde_json(cls, ruta, linea=None, columna=None):
+        """
+        Lee un archivo JSON estructurado (lista de diccionarios o formato registros)
+        Usa el módulo estándar json de Python sin librerías externas
+        """
+        ruta_resuelta = cls.resolver_ruta(ruta)
+        if not os.path.exists(ruta_resuelta):
+            raise ErrorSemantico(
+                f"No se pudo invocar el archivo: no existe '{ruta}'. "
+                f"Verifica la ruta en disco o en la carpeta 'datos/'",
+                linea, columna
+            )
+
+        try:
+            with open(ruta_resuelta, mode="r", encoding="utf-8") as f:
+                datos = json.load(f)
+
+            if isinstance(datos, list):
+                if not datos:
+                    return cls([], [])
+                # Obtenemos las columnas respetando el orden de aparición
+                columnas = []
+                for elem in datos:
+                    if isinstance(elem, dict):
+                        for k in elem.keys():
+                            if k not in columnas:
+                                columnas.append(k)
+                filas = []
+                for elem in datos:
+                    if isinstance(elem, dict):
+                        fila_dict = {}
+                        for col in columnas:
+                            val = elem.get(col)
+                            if isinstance(val, str):
+                                fila_dict[col] = _convertir_tipo_dato(val)
+                            else:
+                                fila_dict[col] = val
+                        filas.append(fila_dict)
+                return cls(columnas, filas)
+            elif isinstance(datos, dict):
+                columnas = datos.get("columnas", [])
+                filas_raw = datos.get("filas", datos.get("datos", []))
+                filas = []
+                for item in filas_raw:
+                    if isinstance(item, dict):
+                        filas.append(item)
+                    elif isinstance(item, (list, tuple)):
+                        filas.append({col: val for col, val in zip(columnas, item)})
+                return cls(columnas, filas)
+            else:
+                raise ErrorSemantico(f"El archivo JSON '{ruta}' debe contener una lista de objetos o registros", linea, columna)
+
+        except Exception as e:
+            if isinstance(e, ErrorSemantico):
+                raise e
+            raise ErrorSemantico(f"Error al leer el archivo JSON '{ruta}': {str(e)}", linea, columna)
+
+    @classmethod
+    def desde_archivo(cls, ruta, linea=None, columna=None):
+        """
+        Detecta inteligentemente si el archivo es CSV o JSON y lo carga en una nueva Poción
+        """
+        if ruta.strip().lower().endswith(".json"):
+            return cls.desde_json(ruta, linea, columna)
+        return cls.desde_csv(ruta, linea, columna)
 
     def a_csv(self, ruta, linea=None, columna=None):
         """
         Guarda la poción en un archivo CSV en el disco
         Escribe primero las columnas y luego cada fila separada por comas
         """
+        # Si la ruta termina en .json, delegamos directamente a exportar JSON
+        if ruta.strip().lower().endswith(".json"):
+            return self.a_json(ruta, linea, columna)
+
         try:
             # Si la carpeta de destino no existe, la creamos de una vez
             directorio = os.path.dirname(ruta)
@@ -190,7 +268,34 @@ class Pocion:
                     f.write(",".join(valores) + "\n")
             return ruta
         except Exception as e:
+            if isinstance(e, ErrorSemantico):
+                raise e
             raise ErrorSemantico(f"No se pudo preservar la poción en '{ruta}': {str(e)}", linea, columna)
+
+    def a_json(self, ruta, linea=None, columna=None):
+        """
+        Exporta la Poción a un archivo JSON estructurado (lista de diccionarios)
+        """
+        try:
+            directorio = os.path.dirname(ruta)
+            if directorio and not os.path.exists(directorio):
+                os.makedirs(directorio, exist_ok=True)
+
+            with open(ruta, mode="w", encoding="utf-8") as f:
+                json.dump(self.filas, f, indent=2, ensure_ascii=False)
+            return ruta
+        except Exception as e:
+            if isinstance(e, ErrorSemantico):
+                raise e
+            raise ErrorSemantico(f"No se pudo preservar la poción en JSON '{ruta}': {str(e)}", linea, columna)
+
+    def a_archivo(self, ruta, linea=None, columna=None):
+        """
+        Detecta la extensión del archivo destino y exporta en CSV o JSON
+        """
+        if ruta.strip().lower().endswith(".json"):
+            return self.a_json(ruta, linea, columna)
+        return self.a_csv(ruta, linea, columna)
 
     def recolectar(self, lista_columnas):
         """
@@ -441,4 +546,16 @@ class Pocion:
 
         filas_muestra = [self.filas[idx].copy() for idx in indices[:cantidad]]
         return Pocion(self.columnas, filas_muestra)
+
+    def a_matriz(self, columnas=None):
+        """
+        Puente de interoperabilidad: convierte columnas numéricas de la Poción a Matriz
+        (conecta nuestro DataFrame artesanal con nuestra versión artesanal de NumPy).
+        """
+        from estructuras.matriz import Matriz
+        cols = columnas if columnas is not None else [
+            c for c in self.columnas
+            if any(isinstance(f.get(c), (int, float)) for f in self.filas)
+        ]
+        return Matriz.desde_pocion(self, cols)
 

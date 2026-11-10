@@ -1,5 +1,5 @@
-# PROGRAMA COMPLETO 1: Análisis de Ventas y Rendimiento Comercial
-# Dominio: Comercio y Finanzas
+# PROGRAMA COMPLETO 1: Análisis de Boletos y Rendimiento de Aerolíneas
+# Dominio: Aerolíneas y Vuelos Internacionales (Destinos: Miami, Madrid, Cancún, Nueva York)
 # Flujo: Carga -> Inspección -> Sanación -> Selección -> Purificación -> Transmutación -> Ordenamiento -> Destilación -> Preservación
 
 # 1 Invocamos la poción con los datos crudos de ventas

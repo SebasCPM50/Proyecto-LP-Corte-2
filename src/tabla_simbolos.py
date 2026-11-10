@@ -54,15 +54,23 @@ class TablaSimbolos:
         return simbolo
 
     def determinar_tipo(self, valor):
-        # Mira qué cosa es en Python y le asigna el nombre alquímico correspondiente
+        # Mira qué cosa es en Python y le asigna el nombre semántico correspondiente
+        from estructuras.matriz import Matriz
+        from estructuras.arreglo import Arreglo
         if isinstance(valor, Pocion):
             return "POCION"
+        elif isinstance(valor, Matriz):
+            return "MATRIZ"
+        elif isinstance(valor, (Arreglo, list, tuple)):
+            return "LISTA"
         elif isinstance(valor, bool):
             return "BOOLEANO"
         elif isinstance(valor, (int, float)):
             return "NUMERO"
         elif isinstance(valor, str):
             return "CADENA"
+        elif hasattr(valor, "predecir") or hasattr(valor, "agrupar"):
+            return "MODELO_ML"
         return "DESCONOCIDO"
 
     def existe(self, nombre):
@@ -129,6 +137,13 @@ class TablaSimbolos:
             if simb.tipo == "POCION":
                 pocion = simb.valor
                 print(f"  * {nombre} -> POCION [{len(pocion)} filas x {len(pocion.columnas)} columnas]: {pocion.columnas}")
+            elif simb.tipo == "MATRIZ":
+                m = simb.valor
+                print(f"  * {nombre} -> MATRIZ [{m.filas} filas x {m.columnas} columnas]")
+            elif simb.tipo == "LISTA":
+                print(f"  * {nombre} -> LISTA [{len(simb.valor)} elementos]: {simb.valor}")
+            elif simb.tipo == "MODELO_ML":
+                print(f"  * {nombre} -> MODELO_ML: {simb.valor}")
             else:
                 print(f"  * {nombre} -> {simb.tipo} = {simb.valor}")
         print()

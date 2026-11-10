@@ -1,0 +1,38 @@
+[
+  {
+    "aerolinea": "Avianca",
+    "minutos_totales": 85,
+    "promedio_retraso": 28.333333333333332,
+    "total_vuelos_afectados": 3
+  },
+  {
+    "aerolinea": "American",
+    "minutos_totales": 45,
+    "promedio_retraso": 45.0,
+    "total_vuelos_afectados": 1
+  },
+  {
+    "aerolinea": "Copa",
+    "minutos_totales": 10,
+    "promedio_retraso": 10.0,
+    "total_vuelos_afectados": 1
+  },
+  {
+    "aerolinea": "AirFrance",
+    "minutos_totales": 37,
+    "promedio_retraso": 18.5,
+    "total_vuelos_afectados": 2
+  },
+  {
+    "aerolinea": "LATAM",
+    "minutos_totales": 5,
+    "promedio_retraso": 5.0,
+    "total_vuelos_afectados": 1
+  },
+  {
+    "aerolinea": "Iberia",
+    "minutos_totales": 60,
+    "promedio_retraso": 60.0,
+    "total_vuelos_afectados": 1
+  }
+]

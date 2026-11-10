@@ -7,8 +7,8 @@
 ### INFORMACIÓN DEL PROYECTO
 * **Nombre del Lenguaje**: Arcanum
 * **Paradigma**: Declarativo, funcional y analítico (orientado a procesamiento de datos)
-* **Entregas integradas**: Entrega 1 (Gramática y Diseño) + Entrega 2 (Semántica, Motor Artesanal, Intérprete y Compendios)
-* **Condición estricta**: Cero librerías externas (sin Pandas, sin NumPy, sin módulo csv de Python)
+* **Entregas integradas**: Entrega 1 (Gramática y Front-end) + Entrega 2 (Semántica, Motor Artesanal, Intérprete) + Entrega 3 y Final (Visualización PNG, Machine Learning, Matrices, Control de Flujo y Desacople Modular)
+* **Condición estricta**: Cero librerías externas de ciencia de datos (Pandas y NumPy fueron creados 100% desde cero de forma artesanal)
 
 ---
 
@@ -27,7 +27,7 @@ El lenguaje adopta una metáfora alquímica coherente donde:
 
 | Operación estándar de datos | Término en Arcanum | Propósito analítico |
 | :--- | :--- | :--- |
-| `read_csv` | `invocar desde "ruta.csv"` | Carga un archivo CSV desde disco a memoria |
+| `read_csv` / `read_json` | `invocar desde "ruta.csv"` / `"ruta.json"` | Carga un archivo CSV o JSON desde disco a memoria con detección automática |
 | `select` | `recolectar [col1, col2] de tabla` | Proyección: conserva únicamente las columnas pedidas |
 | `filter` / `where` | `purificar tabla donde (condicion)` | Filtrado: conserva las filas que cumplen el predicado booleano |
 | `sort_values` | `ordenar tabla por col [asc/desc]` | Ordenamiento de registros por una columna |
@@ -37,8 +37,16 @@ El lenguaje adopta una metáfora alquímica coherente donde:
 | `group_by` + `aggregate` | `destilar tabla agrupar [cols] agregando [...]` | Agrupación y cálculo de métricas (suma, media, mediana, std, min, max, contar) |
 | `describe` | `describir tabla` | Genera una tabla con estadísticas de columnas numéricas |
 | `print` | `revelar tabla` | Muestra la tabla en consola sin recortar filas |
-| `to_csv` | `preservar tabla en "ruta.csv"` | Exporta la tabla transformada a un archivo CSV en disco |
+| `to_csv` / `to_json` | `preservar tabla en "ruta.csv"` / `"ruta.json"` | Exporta la tabla transformada a un archivo CSV o JSON en disco |
 | `random` / muestreo | `random(min, max)` / `muestra_aleatoria(n)` | Generación de números aleatorios y muestreo de filas sin librerías |
+| `if` / `else` | `si (condicion) { ... } sino { ... }` | Control de flujo condicional |
+| `while` | `mientras (condicion) { ... }` | Bucle iterativo de repetición |
+| `matrix` (NumPy) | `matriz([[1, 2], [3, 4]])` / `transpuesta(m)` | Álgebra lineal pura: suma, multiplicación matricial y transpuesta |
+| `list` / vector | `[elem1, elem2, elem3]` | Estructura de Arreglo funcional con map, filter y reduce |
+| `linear_regression` | `regresion(x, y)` / `predecir(modelo, x)` | Machine Learning: Predicción continua por mínimos cuadrados |
+| `knn_classifier` | `knn(datos, etiquetas, k)` / `predecir(m, p)` | Machine Learning: Clasificación por distancia euclidiana |
+| `kmeans_clustering`| `kmeans(pocion, [col1, col2], k)` | Machine Learning: Agrupamiento no supervisado con centroides |
+| `plot` (Matplotlib) | `forjar artefacto barras/lineas/...` | Motor de visualización: genera y exporta gráficas a PNG |
 | `import` propio | `usar compendio nombre` | Carga una librería propia escrita en Arcanum |
 | `function` | `receta nombre(param) { ... devolver x; }` | Define y ejecuta funciones propias con memoria local |
 
@@ -235,6 +243,21 @@ Se verificó que el compilador capture y reporte con claridad las anomalías ló
 * Invoca la receta `matematicas.calcular_iva(subtotal, 0.19)`
 * Aplica descuentos calculados y muestra los resultados en la terminal
 
+#### Caso de Estudio Final Integrado (`examples/ejemplo5_caso_estudio_final.arc`)
+* **Flujo completo de Ciencia de Datos**: Carga de CSV $\rightarrow$ Limpieza y sanación $\rightarrow$ Filtrado $\rightarrow$ Transmutación
+* **Control de flujo**: Evaluación con `si / sino` y bucle iterativo `mientras`
+* **Álgebra Lineal**: Creación y transposición de `Matriz` (NumPy artesanal)
+* **Machine Learning Artesanal**:
+  * **Predicción**: Modelo de Regresión Lineal entrenado para estimar ingresos futuros ($R^2 = 1.0$)
+  * **Clasificación**: KNN entrenado para clasificar clientes en Minoristas y Mayoristas
+  * **Agrupamiento**: K-Means clustering generando 3 segmentos en la tabla
+* **Visualización a PNG (Corte 3)**:
+  * `salidas/1_grafica_barras_ciudades.png`: Gráfica de barras de facturación por ciudad
+  * `salidas/2_grafica_lineas_ventas.png`: Serie temporal de ventas
+  * `salidas/3_grafica_dispersion.png`: Dispersión de unidades vs ingreso
+  * `salidas/4_grafica_histograma_precios.png`: Histograma de frecuencias de venta
+* **Preservación**: Exporta tabla consolidada a `salidas/resumen_caso_estudio_final.csv`
+
 ---
 
 ## GUÍA DE INSTALACIÓN Y EJECUCIÓN EN MÁQUINA VIRTUAL UBUNTU
@@ -276,6 +299,12 @@ python3 src/main.py examples/ejemplo3_calidad_aire.arc
 
 # Ejemplo 4: Compendios y recetas
 python3 src/main.py examples/ejemplo4_compendios_recetas.arc
+
+# Ejemplo 5: Caso de estudio final integrado (ML, matrices, gráficos y CSV/JSON)
+python3 src/main.py examples/ejemplo5_caso_estudio_final.arc
+
+# Ejemplo 6: Analítica de vuelos y retrasos con carga nativa en JSON
+python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc
 
 # Visualizar el árbol de análisis sintáctico
 python3 src/main.py examples/ejemplo1_analisis_ventas.arc --arbol

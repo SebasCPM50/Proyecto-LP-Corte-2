@@ -1,0 +1,167 @@
+[
+  {
+    "id_vuelo": "AV120",
+    "aerolinea": "Avianca",
+    "origen": "Bogota",
+    "destino": "Miami",
+    "clase": "Economica",
+    "pasajeros": 165,
+    "precio_boleto": 320.0,
+    "retraso_min": 15,
+    "distancia_km": 2430
+  },
+  {
+    "id_vuelo": "LA500",
+    "aerolinea": "LATAM",
+    "origen": "Lima",
+    "destino": "Madrid",
+    "clase": "Ejecutiva",
+    "pasajeros": 210,
+    "precio_boleto": 680.0,
+    "retraso_min": 0,
+    "distancia_km": 9520
+  },
+  {
+    "id_vuelo": "AA902",
+    "aerolinea": "American",
+    "origen": "Miami",
+    "destino": "Nueva_York",
+    "clase": "Economica",
+    "pasajeros": 180,
+    "precio_boleto": 210.0,
+    "retraso_min": 45,
+    "distancia_km": 1750
+  },
+  {
+    "id_vuelo": "IB650",
+    "aerolinea": "Iberia",
+    "origen": "Madrid",
+    "destino": "Paris",
+    "clase": "Primera_Clase",
+    "pasajeros": 140,
+    "precio_boleto": 850.0,
+    "retraso_min": 0,
+    "distancia_km": 1050
+  },
+  {
+    "id_vuelo": "CM404",
+    "aerolinea": "Copa",
+    "origen": "Panama",
+    "destino": "Cancun",
+    "clase": "Economica",
+    "pasajeros": 155,
+    "precio_boleto": 290.0,
+    "retraso_min": 10,
+    "distancia_km": 1560
+  },
+  {
+    "id_vuelo": "AF422",
+    "aerolinea": "AirFrance",
+    "origen": "Paris",
+    "destino": "Tokio",
+    "clase": "Ejecutiva",
+    "pasajeros": 250,
+    "precio_boleto": 920.0,
+    "retraso_min": 25,
+    "distancia_km": 9710
+  },
+  {
+    "id_vuelo": "UA880",
+    "aerolinea": "United",
+    "origen": "Houston",
+    "destino": "Londres",
+    "clase": "Economica",
+    "pasajeros": 195,
+    "precio_boleto": 540.0,
+    "retraso_min": 0,
+    "distancia_km": 7750
+  },
+  {
+    "id_vuelo": "AV240",
+    "aerolinea": "Avianca",
+    "origen": "Bogota",
+    "destino": "Cancun",
+    "clase": "Economica",
+    "pasajeros": 150,
+    "precio_boleto": 280.0,
+    "retraso_min": 30,
+    "distancia_km": 2280
+  },
+  {
+    "id_vuelo": "LA801",
+    "aerolinea": "LATAM",
+    "origen": "Santiago",
+    "destino": "Miami",
+    "clase": "Ejecutiva",
+    "pasajeros": 220,
+    "precio_boleto": 620.0,
+    "retraso_min": 5,
+    "distancia_km": 6650
+  },
+  {
+    "id_vuelo": "AA305",
+    "aerolinea": "American",
+    "origen": "Nueva_York",
+    "destino": "Londres",
+    "clase": "Primera_Clase",
+    "pasajeros": 160,
+    "precio_boleto": 950.0,
+    "retraso_min": 0,
+    "distancia_km": 5570
+  },
+  {
+    "id_vuelo": "IB700",
+    "aerolinea": "Iberia",
+    "origen": "Madrid",
+    "destino": "Buenos_Aires",
+    "clase": "Economica",
+    "pasajeros": 270,
+    "precio_boleto": 490.0,
+    "retraso_min": 60,
+    "distancia_km": 10070
+  },
+  {
+    "id_vuelo": "CM210",
+    "aerolinea": "Copa",
+    "origen": "Panama",
+    "destino": "Miami",
+    "clase": "Economica",
+    "pasajeros": 145,
+    "precio_boleto": 260.0,
+    "retraso_min": 0,
+    "distancia_km": 1870
+  },
+  {
+    "id_vuelo": "AF108",
+    "aerolinea": "AirFrance",
+    "origen": "Paris",
+    "destino": "Nueva_York",
+    "clase": "Ejecutiva",
+    "pasajeros": 230,
+    "precio_boleto": 780.0,
+    "retraso_min": 12,
+    "distancia_km": 5830
+  },
+  {
+    "id_vuelo": "UA415",
+    "aerolinea": "United",
+    "origen": "Chicago",
+    "destino": "Frankfurt",
+    "clase": "Economica",
+    "pasajeros": 205,
+    "precio_boleto": 510.0,
+    "retraso_min": 0,
+    "distancia_km": 6970
+  },
+  {
+    "id_vuelo": "AV900",
+    "aerolinea": "Avianca",
+    "origen": "Bogota",
+    "destino": "Madrid",
+    "clase": "Ejecutiva",
+    "pasajeros": 240,
+    "precio_boleto": 710.0,
+    "retraso_min": 40,
+    "distancia_km": 8020
+  }
+]

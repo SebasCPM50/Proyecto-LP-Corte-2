@@ -13,7 +13,8 @@ Cómo se corre:
 import sys
 import os
 
-# Agregamos la carpeta generated para poder importar las clases de ANTLR
+# Agregamos las carpetas src y generated para poder importar las clases modulares
+sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "generated"))
 
 from antlr4 import FileStream, CommonTokenStream

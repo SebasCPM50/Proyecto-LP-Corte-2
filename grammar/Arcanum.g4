@@ -12,12 +12,34 @@ programa
 // Cada hechizo (instrucción) puede ser una asignación a variable o una acción directa.
 hechizo
     : asignacion
+    | instruccionSi
+    | instruccionMientras
+    | instruccionPara
     | instruccionPreservar
     | instruccionRevelar
     | instruccionDescribir
     | instruccionUsar
     | definicionReceta
     | instruccionForjar
+    ;
+
+// Condicionales clásicos: si (condicion) { ... } sino { ... }
+instruccionSi
+    : SI '(' condicion ')' bloqueSi=bloqueHechizos ( SINO bloqueSino=bloqueHechizos )?
+    ;
+
+// Bucles iterativos: mientras (condicion) { ... }
+instruccionMientras
+    : MIENTRAS '(' condicion ')' bloqueHechizos
+    ;
+
+// Bucle sobre colecciones o listas: para elemento en lista { ... }
+instruccionPara
+    : PARA ID EN expresion bloqueHechizos
+    ;
+
+bloqueHechizos
+    : '{' hechizo* '}'
     ;
 
 // Asignación clásica: <variable> = <expresión>;
@@ -163,10 +185,11 @@ listaIds
     : ID (',' ID)*
     ;
 
-// Visualización (para Corte 3, reconocida sintácticamente desde Corte 1 y 2):
-// forjar artefacto barras desde ventas con eje_x ciudad, eje_y precio, titulo "...";
+// Visualización (Corte 3: generación de gráficas a PNG):
+// forjar artefacto barras desde ventas con eje_x ciudad, eje_y precio, titulo "...", salida "salidas/grafica.png";
+// graficar lineas desde resumen con eje_x fecha, eje_y total, titulo "...", guardar como "salidas/lineas.png";
 instruccionForjar
-    : FORJAR ARTEFACTO ID DESDE ID CON listaParametros ';'
+    : ( FORJAR ARTEFACTO | GRAFICAR ) ID DESDE ID CON listaParametros ( ( GUARDAR COMO | GUARDAR EN ) CADENA )? ';'
     ;
 
 listaParametros
@@ -177,6 +200,7 @@ parametro
     : EJE_X ID
     | EJE_Y ID
     | TITULO CADENA
+    | ( SALIDA | GUARDAR COMO | GUARDAR EN ) CADENA
     ;
 
 // Condiciones booleanas recursivas con precedencia: NOT > AND > OR
@@ -196,17 +220,24 @@ operadorComparacion
     : '>' | '<' | '>=' | '<=' | '==' | '!='
     ;
 
-// Expresión aritmética con soporte de potencia (^), mult/div/mod (*, /, %) y suma/resta (+, -)
+// Expresión aritmética con soporte de potencia (^), mult/div/mod (*, /, %), suma/resta (+, -) e indexación ([])
 expresionAritmetica
     : expresionAritmetica '^' expresionAritmetica                 # potencia
     | expresionAritmetica ( '*' | '/' | '%' ) expresionAritmetica # multDivMod
     | expresionAritmetica ( '+' | '-' ) expresionAritmetica       # sumaResta
+    | expresionAritmetica '[' expresionAritmetica ']'             # indexacion
     | '(' expresionAritmetica ')'                                 # parentesis
+    | listaLiteral                                                # listaLit
     | llamadaReceta                                               # llamadaFuncion
     | NUMERO                                                      # numero
     | CADENA                                                      # cadenaLiteral
     | ( VERDADERO | FALSO )                                       # booleano
     | ID                                                          # identificador
+    ;
+
+// Estructura de datos: lista o arreglo literal [elem1, elem2, ...]
+listaLiteral
+    : '[' ( expresionAritmetica ( ',' expresionAritmetica )* )? ']'
     ;
 
 valorLiteral
@@ -258,12 +289,20 @@ CONTAR           : 'contar' | 'conteo';
 ASC              : 'asc' | 'ascendente';
 DESC             : 'desc' | 'descendente';
 
-// Visualización (para Corte 3, reconocida en Corte 1 y 2)
+// Control de flujo (condicionales y bucles)
+SI               : 'si';
+SINO             : 'sino';
+MIENTRAS         : 'mientras';
+PARA             : 'para';
+
+// Visualización (para Corte 3)
 FORJAR           : 'forjar';
 ARTEFACTO        : 'artefacto';
+GRAFICAR         : 'graficar';
 EJE_X            : 'eje_x';
 EJE_Y            : 'eje_y';
 TITULO           : 'titulo';
+SALIDA           : 'salida';
 
 // Preposiciones y conectores
 DESDE            : 'desde';

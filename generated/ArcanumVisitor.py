@@ -1,4 +1,4 @@
-# Generated from Arcanum.g4 by ANTLR 4.13.2
+# Generated from C:/Users/sebas/.gemini/antigravity/scratch/repo_clone/grammar/Arcanum.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ArcanumParser import ArcanumParser
@@ -16,6 +16,26 @@ class ArcanumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ArcanumParser#hechizo.
     def visitHechizo(self, ctx:ArcanumParser.HechizoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#instruccionSi.
+    def visitInstruccionSi(self, ctx:ArcanumParser.InstruccionSiContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#instruccionMientras.
+    def visitInstruccionMientras(self, ctx:ArcanumParser.InstruccionMientrasContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#instruccionPara.
+    def visitInstruccionPara(self, ctx:ArcanumParser.InstruccionParaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#bloqueHechizos.
+    def visitBloqueHechizos(self, ctx:ArcanumParser.BloqueHechizosContext):
         return self.visitChildren(ctx)
 
 
@@ -224,8 +244,23 @@ class ArcanumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ArcanumParser#indexacion.
+    def visitIndexacion(self, ctx:ArcanumParser.IndexacionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#listaLit.
+    def visitListaLit(self, ctx:ArcanumParser.ListaLitContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ArcanumParser#identificador.
     def visitIdentificador(self, ctx:ArcanumParser.IdentificadorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#listaLiteral.
+    def visitListaLiteral(self, ctx:ArcanumParser.ListaLiteralContext):
         return self.visitChildren(ctx)
 
 

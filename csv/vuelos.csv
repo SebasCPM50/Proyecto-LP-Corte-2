@@ -1,0 +1,16 @@
+id_vuelo,aerolinea,origen,destino,clase,pasajeros,precio_boleto,retraso_min,distancia_km
+AV120,Avianca,Bogota,Miami,Economica,165,320.0,15,2430
+LA500,LATAM,Lima,Madrid,Ejecutiva,210,680.0,0,9520
+AA902,American,Miami,Nueva_York,Economica,180,210.0,45,1750
+IB650,Iberia,Madrid,Paris,Primera_Clase,140,850.0,0,1050
+CM404,Copa,Panama,Cancun,Economica,155,290.0,10,1560
+AF422,AirFrance,Paris,Tokio,Ejecutiva,250,920.0,25,9710
+UA880,United,Houston,Londres,Economica,195,540.0,0,7750
+AV240,Avianca,Bogota,Cancun,Economica,150,280.0,30,2280
+LA801,LATAM,Santiago,Miami,Ejecutiva,220,620.0,5,6650
+AA305,American,Nueva_York,Londres,Primera_Clase,160,950.0,0,5570
+IB700,Iberia,Madrid,Buenos_Aires,Economica,270,490.0,60,10070
+CM210,Copa,Panama,Miami,Economica,145,260.0,0,1870
+AF108,AirFrance,Paris,Nueva_York,Ejecutiva,230,780.0,12,5830
+UA415,United,Chicago,Frankfurt,Economica,205,510.0,0,6970
+AV900,Avianca,Bogota,Madrid,Ejecutiva,240,710.0,40,8020

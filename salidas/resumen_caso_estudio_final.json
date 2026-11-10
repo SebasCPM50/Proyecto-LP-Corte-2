@@ -1,0 +1,26 @@
+[
+  {
+    "ciudad": "Miami",
+    "ingreso_total": 7110,
+    "ticket_promedio": 1777.5,
+    "total_transacciones": 4
+  },
+  {
+    "ciudad": "Madrid",
+    "ingreso_total": 5320,
+    "ticket_promedio": 1330.0,
+    "total_transacciones": 4
+  },
+  {
+    "ciudad": "Cancun",
+    "ingreso_total": 1680,
+    "ticket_promedio": 840.0,
+    "total_transacciones": 2
+  },
+  {
+    "ciudad": "Nueva_York",
+    "ingreso_total": 2510,
+    "ticket_promedio": 1255.0,
+    "total_transacciones": 2
+  }
+]

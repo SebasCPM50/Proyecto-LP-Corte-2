@@ -8,7 +8,8 @@ No usamos Pandas ni NumPy ni import de Python para compendios
 import os
 import sys
 
-# Agregamos la carpeta generated para poder usar el visitor generado por ANTLR
+# Agregamos las carpetas src y generated para imports modulares limpios
+sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "generated"))
 
 from antlr4 import FileStream, CommonTokenStream
@@ -82,6 +83,50 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
             # Si estamos en el programa principal lo guardamos en la tabla de símbolos global
             self.tabla.definir(nombre_var, valor, linea=linea, columna=columna)
         return valor
+
+    # Control de flujo (condicionales y bucles)
+
+    def visitBloqueHechizos(self, ctx: ArcanumParser.BloqueHechizosContext):
+        # Ejecuta secuencialmente los hechizos agrupados dentro de un bloque { ... }
+        for hechizo in ctx.hechizo():
+            self.visit(hechizo)
+        return None
+
+    def visitInstruccionSi(self, ctx: ArcanumParser.InstruccionSiContext):
+        # Evalúa la condición booleana y ejecuta el bloque 'si' o el bloque 'sino'
+        cumple = bool(self.visit(ctx.condicion()))
+        if cumple:
+            if ctx.bloqueSi:
+                self.visit(ctx.bloqueSi)
+        elif ctx.bloqueSino:
+            self.visit(ctx.bloqueSino)
+        return None
+
+    def visitInstruccionMientras(self, ctx: ArcanumParser.InstruccionMientrasContext):
+        # Ejecuta el bloque mientras la condición se mantenga verdadera
+        max_iteraciones = 10000
+        contador = 0
+        while bool(self.visit(ctx.condicion())):
+            contador += 1
+            if contador > max_iteraciones:
+                raise ErrorSemantico("Límite de iteraciones alcanzado en bucle 'mientras' (posible ciclo infinito)", ctx.start.line, ctx.start.column)
+            self.visit(ctx.bloqueHechizos())
+        return None
+
+    def visitInstruccionPara(self, ctx: ArcanumParser.InstruccionParaContext):
+        # Bucle funcional sobre colecciones o listas
+        nombre_var = ctx.ID().getText()
+        coleccion = self.visit(ctx.expresion())
+        if not hasattr(coleccion, "__iter__"):
+            raise ErrorSemantico(f"El elemento en 'para {nombre_var} en ...' no es iterable", ctx.start.line, ctx.start.column)
+
+        for item in coleccion:
+            if self._marcos_locales:
+                self._marcos_locales[-1][nombre_var] = item
+            else:
+                self.tabla.definir(nombre_var, item)
+            self.visit(ctx.bloqueHechizos())
+        return None
 
     def visitExpresion(self, ctx: ArcanumParser.ExpresionContext):
         # Visita la expresión que corresponda
@@ -293,11 +338,41 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
         return None
 
     def visitInstruccionForjar(self, ctx: ArcanumParser.InstruccionForjarContext):
-        # Reconoce la instrucción de visualización gráfica (reservada para el tercer corte)
+        # Genera representaciones visuales (barras, líneas, dispersión, histograma) y las exporta a PNG
         tipo_artefacto = ctx.ID(0).getText()
         origen = ctx.ID(1).getText()
-        print(f"[Hechizo de Forja reconocido]: Se preparará artefacto visual '{tipo_artefacto}' desde '{origen}' (reservado para Corte 3)")
-        return None
+        linea = ctx.start.line
+        columna = ctx.start.column
+
+        pocion = self.tabla.obtener_pocion(origen, linea=linea, columna=columna)
+
+        eje_x = None
+        eje_y = None
+        titulo = None
+        ruta_salida = None
+
+        if ctx.listaParametros():
+            for p_ctx in ctx.listaParametros().parametro():
+                if p_ctx.EJE_X():
+                    eje_x = p_ctx.ID().getText()
+                elif p_ctx.EJE_Y():
+                    eje_y = p_ctx.ID().getText()
+                elif p_ctx.TITULO():
+                    titulo = p_ctx.CADENA().getText().strip('"')
+                elif p_ctx.SALIDA() or p_ctx.GUARDAR():
+                    ruta_salida = p_ctx.CADENA().getText().strip('"')
+
+        if ctx.CADENA():
+            ruta_salida = ctx.CADENA().getText().strip('"')
+
+        return MotorDatos.forjar_grafica(
+            tipo=tipo_artefacto,
+            pocion=pocion,
+            eje_x=eje_x,
+            eje_y=eje_y,
+            titulo=titulo,
+            ruta_salida=ruta_salida
+        )
 
     # Compendios y recetas (librerías propias)
 
@@ -366,15 +441,13 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
         else:
             # O si la llamaron directo por su nombre
             receta_nom = ids[0].getText()
+            receta_lower = receta_nom.lower()
             
-            # Prioridad 1: Funciones nativas del lenguaje (random / aleatorio / azar) con 0, 1 o 2 argumentos
-            if receta_nom.lower() in ["random", "aleatorio", "azar"]:
+            # Prioridad 1: Funciones nativas del lenguaje (random / aleatorio / azar)
+            if receta_lower in ["random", "aleatorio", "azar"]:
                 num_args = len(ctx.listaArgumentos().expresion()) if ctx.listaArgumentos() else 0
                 if num_args <= 2:
-                    argumentos = []
-                    if ctx.listaArgumentos():
-                        for expr_arg in ctx.listaArgumentos().expresion():
-                            argumentos.append(self.visit(expr_arg))
+                    argumentos = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
                     from pocion import numero_aleatorio
                     if len(argumentos) == 0:
                         return numero_aleatorio()
@@ -382,6 +455,68 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
                         return numero_aleatorio(0, argumentos[0])
                     elif len(argumentos) == 2:
                         return numero_aleatorio(argumentos[0], argumentos[1])
+
+            # Prioridad 2: Álgebra lineal (NumPy artesanal)
+            elif receta_lower == "matriz":
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if not args:
+                    raise ErrorSemantico("La función matriz() espera una lista de filas, ej: matriz([[1, 2], [3, 4]])", linea, columna)
+                return MotorDatos.crear_matriz(args[0])
+
+            elif receta_lower in ["transpuesta", "transponer"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if not args or not hasattr(args[0], "transpuesta"):
+                    raise ErrorSemantico("La función transpuesta() espera una Matriz como argumento", linea, columna)
+                return args[0].transpuesta()
+
+            elif receta_lower == "arreglo":
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                return MotorDatos.crear_arreglo(args[0] if args else [])
+
+            # Prioridad 3: Machine Learning Artesanal (ML)
+            elif receta_lower in ["regresion", "regresion_lineal"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if len(args) != 2:
+                    raise ErrorSemantico("La función regresion(x, y) espera 2 conjuntos de números", linea, columna)
+                return MotorDatos.entrenar_regresion(args[0], args[1])
+
+            elif receta_lower in ["predecir"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if len(args) != 2:
+                    raise ErrorSemantico("La función predecir(modelo, valor) espera un modelo y un nuevo valor", linea, columna)
+                modelo, nuevo_val = args[0], args[1]
+                if not hasattr(modelo, "predecir"):
+                    raise ErrorSemantico("El primer argumento de predecir debe ser un modelo entrenado", linea, columna)
+                return modelo.predecir(nuevo_val)
+
+            elif receta_lower in ["knn", "clasificador_knn"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if len(args) < 2:
+                    raise ErrorSemantico("La función knn(datos, etiquetas, k) espera datos y etiquetas de clase", linea, columna)
+                k = int(args[2]) if len(args) >= 3 else 3
+                return MotorDatos.entrenar_knn(args[0], args[1], k=k)
+
+            elif receta_lower in ["kmeans", "agrupar_kmeans"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if len(args) < 2:
+                    raise ErrorSemantico("La función kmeans(pocion, columnas, k) espera una Poción y lista de columnas", linea, columna)
+                pocion_obj = args[0]
+                cols = [str(c) for c in args[1]] if isinstance(args[1], (list, tuple)) or hasattr(args[1], "a_lista") else [str(args[1])]
+                k = int(args[2]) if len(args) >= 3 else 2
+                return MotorDatos.agrupar_kmeans(pocion_obj, cols, k=k)
+
+            # Prioridad 4: Utilidades funcionales
+            elif receta_lower in ["longitud", "len"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                return len(args[0]) if args else 0
+
+            elif receta_lower in ["rango", "range"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                from estructuras.arreglo import Arreglo
+                if len(args) == 1:
+                    return Arreglo(list(range(int(args[0]))))
+                elif len(args) >= 2:
+                    return Arreglo(list(range(int(args[0]), int(args[1]))))
 
             if receta_nom in self._recetas_locales:
                 receta = self._recetas_locales[receta_nom]
@@ -538,6 +673,25 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
     def visitParentesis(self, ctx: ArcanumParser.ParentesisContext):
         # Resuelve lo que esté adentro de los paréntesis primero
         return self.visit(ctx.expresionAritmetica())
+
+    def visitListaLit(self, ctx: ArcanumParser.ListaLitContext):
+        # Visita la regla de lista literal
+        return self.visit(ctx.listaLiteral())
+
+    def visitListaLiteral(self, ctx: ArcanumParser.ListaLiteralContext):
+        # Construye un Arreglo funcional con los elementos evaluados
+        from estructuras.arreglo import Arreglo
+        elementos = [self.visit(e) for e in ctx.expresionAritmetica()] if ctx.expresionAritmetica() else []
+        return Arreglo(elementos)
+
+    def visitIndexacion(self, ctx: ArcanumParser.IndexacionContext):
+        # Acceso por índice a una lista o matriz: objeto[indice]
+        coleccion = self.visit(ctx.expresionAritmetica(0))
+        indice = self.visit(ctx.expresionAritmetica(1))
+        try:
+            return coleccion[int(indice)]
+        except Exception as e:
+            raise ErrorSemantico(f"Error al indexar en [{indice}]: {str(e)}", ctx.start.line, ctx.start.column)
 
     def visitNumero(self, ctx: ArcanumParser.NumeroContext):
         # Convierte el texto del token a int o float

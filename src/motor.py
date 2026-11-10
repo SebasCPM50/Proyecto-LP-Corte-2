@@ -15,13 +15,23 @@ class MotorDatos:
 
     @staticmethod
     def cargar_csv(ruta, linea=None, columna=None):
-        # Abre y carga los datos de un archivo CSV en disco
-        return Pocion.desde_csv(ruta, linea, columna)
+        # Abre y carga los datos de un archivo (CSV o JSON) en disco
+        return Pocion.desde_archivo(ruta, linea, columna)
+
+    @staticmethod
+    def cargar_archivo(ruta, linea=None, columna=None):
+        # Abre y carga datos en formato CSV o JSON detectando su extensión
+        return Pocion.desde_archivo(ruta, linea, columna)
 
     @staticmethod
     def guardar_csv(pocion, ruta, linea=None, columna=None):
-        # Guarda la tabla actual en un archivo CSV nuevo
-        return pocion.a_csv(ruta, linea, columna)
+        # Guarda la tabla actual en un archivo (CSV o JSON) nuevo
+        return pocion.a_archivo(ruta, linea, columna)
+
+    @staticmethod
+    def guardar_archivo(pocion, ruta, linea=None, columna=None):
+        # Guarda la tabla en disco en formato CSV o JSON según su extensión
+        return pocion.a_archivo(ruta, linea, columna)
 
     @staticmethod
     def recolectar(pocion, columnas):
@@ -73,4 +83,55 @@ class MotorDatos:
         # Saca un número aleatorio entre mínimo y máximo
         from pocion import numero_aleatorio
         return numero_aleatorio(minimo, maximo)
+
+    # =========================================================================
+    # Métodos de Visualización (Corte 3 - Nuestra versión de Matplotlib)
+    # =========================================================================
+
+    @staticmethod
+    def forjar_grafica(tipo, pocion, eje_x=None, eje_y=None, titulo=None, ruta_salida=None, color=None):
+        """Genera una gráfica estadística y la exporta a formato PNG."""
+        from visualizacion.graficador import GraficadorArcanum
+        return GraficadorArcanum.forjar(tipo, pocion, eje_x, eje_y, titulo, ruta_salida, color)
+
+    # =========================================================================
+    # Métodos de Estructuras de Datos y Álgebra Lineal (Nuestra versión de NumPy)
+    # =========================================================================
+
+    @staticmethod
+    def crear_matriz(datos):
+        """Crea una instancia de Matriz para operaciones de álgebra lineal."""
+        from estructuras.matriz import Matriz
+        return Matriz(datos)
+
+    @staticmethod
+    def crear_arreglo(elementos):
+        """Crea una instancia de Arreglo para operaciones funcionales."""
+        from estructuras.arreglo import Arreglo
+        return Arreglo(elementos)
+
+    # =========================================================================
+    # Métodos de Machine Learning Artesanal (ML)
+    # =========================================================================
+
+    @staticmethod
+    def entrenar_regresion(x, y):
+        """Entrena un modelo de predicción continua (Regresión Lineal)."""
+        from ml.regresion import RegresionLineal
+        modelo = RegresionLineal()
+        return modelo.entrenar(x, y)
+
+    @staticmethod
+    def entrenar_knn(datos_x, etiquetas_y, k=3):
+        """Entrena un modelo de clasificación supervisada (K-Nearest Neighbors)."""
+        from ml.clasificacion import KNNClasificador
+        modelo = KNNClasificador(k=k)
+        return modelo.entrenar(datos_x, etiquetas_y)
+
+    @staticmethod
+    def agrupar_kmeans(pocion, columnas, k=2, nombre_columna="cluster"):
+        """Aplica agrupamiento no supervisado (K-Means) sobre una Poción."""
+        from ml.clustering import KMediasClustering
+        modelo = KMediasClustering(k=k)
+        return modelo.asignar_a_pocion(pocion, columnas, nombre_columna=nombre_columna)
 
