@@ -12,6 +12,36 @@
 
 ---
 
+## ESTRUCTURA DEL REPOSITORIO Y ORGANIZACIÓN DE CARPETAS
+
+Todas las carpetas del proyecto se encuentran organizadas en la raíz del repositorio para facilitar su navegación directa:
+
+```
+├── compendios/           Librerías propias escritas en Arcanum (.arc)
+├── csv/                  Datasets tabulares de prueba (CSV y JSON)
+├── datos/                Datasets principales (vuelos.csv, vuelos.json, ventas.csv, etc.)
+├── docs/                 Guía maestra de estudio y sustentación oral (.docx)
+├── examples/             Grimorios (.arc) con casos de uso reales y pruebas completas
+├── generated/            Parser, Lexer y Visitor autogenerados por ANTLR4
+├── grammar/              Gramática formal de Arcanum (Arcanum.g4)
+├── salidas/              Artefactos generados: 5 gráficas PNG y exportaciones CSV / JSON
+├── src/                  Código fuente del compilador e intérprete en Python
+│   ├── estructuras/      Álgebra lineal artesanal: Arreglo funcional (1D) y Matriz (2D)
+│   ├── ml/               Machine Learning propio: Regresión Lineal, KNN y K-Means
+│   ├── visualizacion/    Motor gráfico desacoplado para exportación a PNG
+│   ├── main.py           Punto de entrada de línea de comandos del lenguaje
+│   ├── motor.py          Fachada analítica (Patrón GoF Facade)
+│   ├── pocion.py         DataFrame artesanal inmutable (Pandas propio)
+│   ├── tabla_simbolos.py Libreta de memoria, tipos y ámbitos
+│   └── visitor.py        Intérprete Visitor desacoplado de ANTLR
+├── tests/                Suite de 44 pruebas automatizadas con pytest (100% éxito)
+├── .gitignore            Filtro de archivos temporales de Git
+├── README.md             Documentación oficial y manual de sustentación
+└── requirements.txt      Dependencias mínimas de ejecución
+```
+
+---
+
 ## RESUMEN DEL ALCANCE Y CONCEPTO
 
 Arcanum es un lenguaje de dominio específico (DSL) diseñado para analistas y científicos de datos que buscan realizar preparación, limpieza, filtrado, transformación y agregación estadística sobre conjuntos de datos tabulares.
@@ -64,8 +94,8 @@ Por requisito estricto de la asignatura, el proyecto no utiliza Pandas, NumPy ni
 Objeto Pocion
 ├── self.columnas = ['fecha', 'ciudad', 'precio']
 └── self.filas = [
-      {'fecha': '2026-01-05', 'ciudad': 'Bogota', 'precio': 150000},
-      {'fecha': '2026-01-06', 'ciudad': 'Cali',   'precio': 95000}
+      {'fecha': '2026-01-05', 'ciudad': 'Miami',  'precio': 320},
+      {'fecha': '2026-01-06', 'ciudad': 'Madrid', 'precio': 680}
     ]
 ```
 
@@ -178,14 +208,15 @@ instruccionDevolver ::= 'devolver' expresion ';' ;
 ## BATERÍA COMPLETA DE PRUEBAS Y EVIDENCIAS
 
 ### Resultados del Suite Automatizado (pytest)
-Se ejecutaron 28 pruebas automatizadas cubriendo todas las capas del sistema con un resultado de **100% exitoso**:
+Se ejecutaron 44 pruebas automatizadas cubriendo todas las capas del sistema (control de flujo, estructuras de datos funcionales, matrices artesanales, algoritmos de Machine Learning, visualización multivariable, semántica e integración) con un resultado de **100% exitoso**:
 
 ```
-tests/test_unitarias.py ..............                                   [ 50%]
-tests/test_semantica.py .........                                        [ 82%]
-tests/test_integracion.py .....                                          [100%]
+tests/test_corte3.py ................                                    [ 36%]
+tests/test_integracion.py .....                                          [ 47%]
+tests/test_semantica.py ..........                                       [ 70%]
+tests/test_unitarias.py ..............                                   [100%]
 
-============================= 28 passed in 0.13s ==============================
+============================= 44 passed in 1.00s ==============================
 ```
 
 ### Pruebas Unitarias de Pocion Artesanal (`tests/test_unitarias.py`)
