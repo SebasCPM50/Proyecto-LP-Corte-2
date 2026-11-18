@@ -229,11 +229,85 @@ class Pocion:
             raise ErrorSemantico(f"Error al leer el archivo JSON '{ruta}': {str(e)}", linea, columna)
 
     @classmethod
+    def desde_excel(cls, ruta, linea=None, columna=None):
+        """
+        Lee una hoja de cálculo Excel (.xlsx o .xls) y la convierte en una Poción tabular.
+        Soporta openpyxl o un extractor estándar con zipfile y xml.
+        """
+        ruta_resuelta = cls.resolver_ruta(ruta)
+        if not os.path.exists(ruta_resuelta):
+            raise ErrorSemantico(
+                f"No se pudo invocar el archivo Excel: no existe '{ruta}'. "
+                f"Verifica la ruta en disco o en la carpeta 'datos/'",
+                linea, columna
+            )
+
+        try:
+            try:
+                import openpyxl
+                wb = openpyxl.load_workbook(ruta_resuelta, data_only=True)
+                ws = wb.active
+                filas_raw = list(ws.iter_rows(values_only=True))
+                if not filas_raw:
+                    return cls([], [])
+                cabecera = [str(c).strip() for c in filas_raw[0] if c is not None]
+                filas = []
+                for row in filas_raw[1:]:
+                    if not any(v is not None for v in row):
+                        continue
+                    fila_dict = {}
+                    for idx, col in enumerate(cabecera):
+                        val = row[idx] if idx < len(row) else None
+                        fila_dict[col] = _convertir_tipo_dato(str(val)) if isinstance(val, str) else val
+                    filas.append(fila_dict)
+                return cls(cabecera, filas)
+            except ImportError:
+                import zipfile
+                import xml.etree.ElementTree as ET
+                with zipfile.ZipFile(ruta_resuelta, 'r') as z:
+                    shared_strings = []
+                    if "xl/sharedStrings.xml" in z.namelist():
+                        tree = ET.fromstring(z.read("xl/sharedStrings.xml"))
+                        for si in tree.findall("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}si"):
+                            t = si.find("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}t")
+                            shared_strings.append(t.text if t is not None else "")
+                    tree = ET.fromstring(z.read("xl/worksheets/sheet1.xml"))
+                    sheet_data = tree.find("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}sheetData")
+                    rows = []
+                    for row in sheet_data.findall("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}row"):
+                        r_vals = []
+                        for c in row.findall("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}c"):
+                            v = c.find("{http://schemas.openxmlformats.org/spreadsheetml/2006/main}v")
+                            val = v.text if v is not None else None
+                            if c.get("t") == "s" and val is not None and int(val) < len(shared_strings):
+                                val = shared_strings[int(val)]
+                            elif val is not None:
+                                val = _convertir_tipo_dato(val)
+                            r_vals.append(val)
+                        if r_vals:
+                            rows.append(r_vals)
+                    if not rows:
+                        return cls([], [])
+                    cabecera = [str(c).strip() for c in rows[0]]
+                    filas = []
+                    for r in rows[1:]:
+                        fila_dict = {col: (r[i] if i < len(r) else None) for i, col in enumerate(cabecera)}
+                        filas.append(fila_dict)
+                    return cls(cabecera, filas)
+        except Exception as e:
+            if isinstance(e, ErrorSemantico):
+                raise e
+            raise ErrorSemantico(f"Error al leer el archivo Excel '{ruta}': {str(e)}", linea, columna)
+
+    @classmethod
     def desde_archivo(cls, ruta, linea=None, columna=None):
         """
-        Detecta inteligentemente si el archivo es CSV o JSON y lo carga en una nueva Poción
+        Detecta inteligentemente si el archivo es CSV, JSON o Excel (.xlsx) y lo carga en una nueva Poción
         """
-        if ruta.strip().lower().endswith(".json"):
+        ruta_limpia = ruta.strip().lower()
+        if ruta_limpia.endswith(".xlsx") or ruta_limpia.endswith(".xls"):
+            return cls.desde_excel(ruta, linea, columna)
+        elif ruta_limpia.endswith(".json"):
             return cls.desde_json(ruta, linea, columna)
         return cls.desde_csv(ruta, linea, columna)
 

@@ -310,19 +310,23 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
         return None
 
     def visitInstruccionRevelar(self, ctx: ArcanumParser.InstruccionRevelarContext):
-        # Muestra en la terminal toda la tabla completa sin cortar filas
-        nombre_pocion = ctx.ID().getText()
+        # Muestra en la terminal el contenido de una variable (Poción, escalar, lista, modelo)
+        nombre_var = ctx.ID().getText()
         linea = ctx.start.line
         columna = ctx.start.column
 
-        pocion = self.tabla.obtener_pocion(nombre_pocion, linea=linea, columna=columna)
-        print()
-        print(f"[REVELACIÓN DE LA POCIÓN '{nombre_pocion}']")
-        print(f"Dimensiones: {len(pocion)} registros x {len(pocion.columnas)} ingredientes")
-        print(f"Ingredientes: {pocion.columnas}")
-        print()
-        pocion.mostrar()
-        print()
+        simbolo = self.tabla.obtener(nombre_var, linea=linea, columna=columna)
+        val = simbolo.valor
+        if simbolo.tipo == "POCION" or hasattr(val, "mostrar"):
+            print()
+            print(f"[REVELACIÓN DE LA POCIÓN '{nombre_var}']")
+            print(f"Dimensiones: {len(val)} registros x {len(val.columnas)} ingredientes")
+            print(f"Ingredientes: {val.columnas}")
+            print()
+            val.mostrar()
+            print()
+        else:
+            print(f"[REVELACIÓN]: {nombre_var} = {val}")
         return None
 
     def visitInstruccionPreservar(self, ctx: ArcanumParser.InstruccionPreservarContext):
@@ -504,6 +508,20 @@ class ArcanumVisitorEjecutor(ArcanumVisitor):
                 cols = [str(c) for c in args[1]] if isinstance(args[1], (list, tuple)) or hasattr(args[1], "a_lista") else [str(args[1])]
                 k = int(args[2]) if len(args) >= 3 else 2
                 return MotorDatos.agrupar_kmeans(pocion_obj, cols, k=k)
+
+            elif receta_lower in ["mlp", "perceptron"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if len(args) < 2:
+                    raise ErrorSemantico("La función mlp(datos_x, etiquetas_y) espera entradas y etiquetas", linea, columna)
+                return MotorDatos.entrenar_mlp(args[0], args[1])
+
+            elif receta_lower in ["sigmoide", "sigmoid"]:
+                args = [self.visit(e) for e in ctx.listaArgumentos().expresion()] if ctx.listaArgumentos() else []
+                if not args:
+                    raise ErrorSemantico("La función sigmoide(x) espera un valor numérico", linea, columna)
+                import math
+                x = float(args[0])
+                return round(1.0 / (1.0 + math.exp(-max(min(x, 15.0), -15.0))), 6)
 
             # Prioridad 4: Utilidades funcionales
             elif receta_lower in ["longitud", "len"]:

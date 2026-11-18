@@ -27,14 +27,14 @@ Todas las carpetas del proyecto se encuentran organizadas en la raíz del reposi
 ├── salidas/              Artefactos generados: 5 gráficas PNG y exportaciones CSV / JSON
 ├── src/                  Código fuente del compilador e intérprete en Python
 │   ├── estructuras/      Álgebra lineal artesanal: Arreglo funcional (1D) y Matriz (2D)
-│   ├── ml/               Machine Learning propio: Regresión Lineal, KNN y K-Means
+│   ├── ml/               Machine Learning propio: Regresión Lineal, KNN, K-Means y MLP (XOR)
 │   ├── visualizacion/    Motor gráfico desacoplado para exportación a PNG
 │   ├── main.py           Punto de entrada de línea de comandos del lenguaje
 │   ├── motor.py          Fachada analítica (Patrón GoF Facade)
-│   ├── pocion.py         DataFrame artesanal inmutable (Pandas propio)
+│   ├── pocion.py         DataFrame artesanal inmutable (Pandas propio) con soporte CSV, JSON y Excel
 │   ├── tabla_simbolos.py Libreta de memoria, tipos y ámbitos
 │   └── visitor.py        Intérprete Visitor desacoplado de ANTLR
-├── tests/                Suite de 44 pruebas automatizadas con pytest (100% éxito)
+├── tests/                Suite de 46 pruebas automatizadas con pytest (100% éxito)
 ├── .gitignore            Filtro de archivos temporales de Git
 ├── README.md             Documentación oficial y manual de sustentación
 └── requirements.txt      Dependencias mínimas de ejecución
@@ -57,7 +57,7 @@ El lenguaje adopta una metáfora alquímica coherente donde:
 
 | Operación estándar de datos | Término en Arcanum | Propósito analítico |
 | :--- | :--- | :--- |
-| `read_csv` / `read_json` | `invocar desde "ruta.csv"` / `"ruta.json"` | Carga un archivo CSV o JSON desde disco a memoria con detección automática |
+| `read_csv` / `json` / `excel` | `invocar desde "ruta.csv"` / `".json"` / `".xlsx"` | Carga archivos CSV, JSON o Excel (.xlsx) desde disco con detección automática |
 | `select` | `recolectar [col1, col2] de tabla` | Proyección: conserva únicamente las columnas pedidas |
 | `filter` / `where` | `purificar tabla donde (condicion)` | Filtrado: conserva las filas que cumplen el predicado booleano |
 | `sort_values` | `ordenar tabla por col [asc/desc]` | Ordenamiento de registros por una columna |
@@ -76,6 +76,7 @@ El lenguaje adopta una metáfora alquímica coherente donde:
 | `linear_regression` | `regresion(x, y)` / `predecir(modelo, x)` | Machine Learning: Predicción continua por mínimos cuadrados |
 | `knn_classifier` | `knn(datos, etiquetas, k)` / `predecir(m, p)` | Machine Learning: Clasificación por distancia euclidiana |
 | `kmeans_clustering`| `kmeans(pocion, [col1, col2], k)` | Machine Learning: Agrupamiento no supervisado con centroides |
+| `mlp_xor` (Neural Net)| `mlp(X, y)` / `predecir(modelo, p)` | Machine Learning: Perceptrón Multicapa para clasificación no lineal (XOR) |
 | `plot` (Matplotlib) | `forjar artefacto barras/lineas/...` | Motor de visualización: genera y exporta gráficas a PNG |
 | `import` propio | `usar compendio nombre` | Carga una librería propia escrita en Arcanum |
 | `function` | `receta nombre(param) { ... devolver x; }` | Define y ejecuta funciones propias con memoria local |
@@ -208,15 +209,15 @@ instruccionDevolver ::= 'devolver' expresion ';' ;
 ## BATERÍA COMPLETA DE PRUEBAS Y EVIDENCIAS
 
 ### Resultados del Suite Automatizado (pytest)
-Se ejecutaron 44 pruebas automatizadas cubriendo todas las capas del sistema (control de flujo, estructuras de datos funcionales, matrices artesanales, algoritmos de Machine Learning, visualización multivariable, semántica e integración) con un resultado de **100% exitoso**:
+Se ejecutaron 46 pruebas automatizadas cubriendo todas las capas del sistema (control de flujo, estructuras de datos funcionales, matrices artesanales, algoritmos de Machine Learning incluido MLP XOR, lectura multiformato CSV/JSON/Excel, visualización multivariable, semántica e integración) con un resultado de **100% exitoso**:
 
 ```
-tests/test_corte3.py ................                                    [ 36%]
-tests/test_integracion.py .....                                          [ 47%]
-tests/test_semantica.py ..........                                       [ 70%]
+tests/test_corte3.py ..................                                  [ 39%]
+tests/test_integracion.py .....                                          [ 50%]
+tests/test_semantica.py ..........                                       [ 71%]
 tests/test_unitarias.py ..............                                   [100%]
 
-============================= 44 passed in 1.00s ==============================
+============================= 46 passed in 1.11s ==============================
 ```
 
 ### Pruebas Unitarias de Pocion Artesanal (`tests/test_unitarias.py`)
@@ -336,6 +337,9 @@ python3 src/main.py examples/ejemplo5_caso_estudio_final.arc
 
 # Ejemplo 6: Analítica de vuelos y retrasos con carga nativa en JSON
 python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc
+
+# Ejemplo 7: Casos de evaluación de tablero (Factorial, Sigmoide, MLP XOR, Data.xlsx EDA, Primos)
+python3 src/main.py examples/ejemplo7_casos_profesor.arc
 
 # Visualizar el árbol de análisis sintáctico
 python3 src/main.py examples/ejemplo1_analisis_ventas.arc --arbol

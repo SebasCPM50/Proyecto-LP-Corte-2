@@ -9,5 +9,6 @@ Contiene:
 from ml.regresion import RegresionLineal
 from ml.clasificacion import KNNClasificador
 from ml.clustering import KMediasClustering
+from ml.perceptron import PerceptronMulticapa
 
-__all__ = ["RegresionLineal", "KNNClasificador", "KMediasClustering"]
+__all__ = ["RegresionLineal", "KNNClasificador", "KMediasClustering", "PerceptronMulticapa"]

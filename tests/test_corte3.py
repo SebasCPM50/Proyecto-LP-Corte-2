@@ -220,3 +220,29 @@ class TestIntegracionDSLCompleto:
         pocion = tabla.obtener_pocion("resumen")
         assert len(pocion) > 0
         assert "aerolinea" in pocion.columnas
+
+    def test_dsl_invocar_excel_xlsx(self):
+        codigo = """
+        datos = invocar desde "datos/Data.xlsx";
+        resumen = destilar datos por [aerolinea] agregar suma(pasajeros) como total_pasajeros;
+        """
+        tabla = ejecutar_codigo(codigo)
+        pocion = tabla.obtener_pocion("resumen")
+        assert len(pocion) == 5
+        assert "total_pasajeros" in pocion.columnas
+
+    def test_dsl_mlp_xor(self):
+        codigo = """
+        X = [[0, 0], [0, 1], [1, 0], [1, 1]];
+        y_xor = [0, 1, 1, 0];
+        modelo = mlp(X, y_xor);
+        p00 = predecir(modelo, [0, 0]);
+        p01 = predecir(modelo, [0, 1]);
+        p10 = predecir(modelo, [1, 0]);
+        p11 = predecir(modelo, [1, 1]);
+        """
+        tabla = ejecutar_codigo(codigo)
+        assert tabla.obtener_valor("p00") == 0
+        assert tabla.obtener_valor("p01") == 1
+        assert tabla.obtener_valor("p10") == 1
+        assert tabla.obtener_valor("p11") == 0
