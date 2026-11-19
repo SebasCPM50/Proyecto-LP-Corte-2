@@ -94,8 +94,6 @@ Para consultar el catálogo completo de ejemplos de negocio (ventas de aerolíne
 
 ## Documentación y Sustentación
 
-En la carpeta `docs/` se encuentra toda la documentación técnica:
-* **[MANUAL_ARCANUM.docx](docs/MANUAL_ARCANUM.docx)**: Guía breve oficial de 4 páginas con todo lo necesario para la sustentación y repaso rápido.
-* **[manual_usuario.md](docs/manual_usuario.md)**: Versión en texto plano de la guía breve.
-* **[REVISION_Y_CAMBIOS.md](docs/REVISION_Y_CAMBIOS.md)**: Informe de revisión de requisitos y refactorización arquitectónica.
-* **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema.
+En la carpeta `docs/` se encuentra la documentación técnica:
+* **[manual_usuario.md](docs/manual_usuario.md)**: Guía de uso oficial con teoría, sintaxis, ejemplos y explicación del código.
+* **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema (64 tests y 21 ejemplos validados).
