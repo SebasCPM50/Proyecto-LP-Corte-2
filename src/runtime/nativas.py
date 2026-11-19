@@ -1,4 +1,5 @@
 """Registro extensible de funciones del lenguaje, separado del recorrido ANTLR."""
+import math
 from errores import ErrorSemantico
 from estructuras.arreglo import Arreglo
 from estructuras.matriz import Matriz
@@ -87,6 +88,9 @@ def crear_registro():
     simple("tabla", 2, 2, tabla)
     simple("columna", 2, 2, columna)
     simple("a_matriz", 2, 2, Matriz.desde_pocion)
+    simple("exp", 1, 1, lambda x: math.exp(float(x)))
+    simple("tanh tan_hiperbolico", 1, 1, lambda x: math.tanh(float(x)))
+    simple("sigmoide", 1, 1, lambda x: 1.0 / (1.0 + math.exp(-float(x))))
     r.registrar("mapear", 2, 2, lambda i, a, f: funcional(i, "mapear", a, f))
     r.registrar("filtrar", 2, 2, lambda i, a, f: funcional(i, "filtrar", a, f))
     r.registrar("reducir", 3, 3, lambda i, a, f, inicial: funcional(i, "reducir", a, f, inicial))
