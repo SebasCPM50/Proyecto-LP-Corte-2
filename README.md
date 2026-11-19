@@ -24,7 +24,7 @@ Todas las carpetas del proyecto se encuentran organizadas en la raíz del reposi
 ├── examples/             Grimorios (.arc) con casos de uso reales y pruebas completas
 ├── generated/            Parser, Lexer y Visitor autogenerados por ANTLR4
 ├── grammar/              Gramática formal de Arcanum (Arcanum.g4)
-├── salidas/              Artefactos generados: 5 gráficas PNG y exportaciones CSV / JSON
+├── salidas/              Artefactos generados: 7 gráficas PNG y exportaciones CSV / JSON
 ├── src/                  Código fuente del compilador e intérprete en Python
 │   ├── estructuras/      Álgebra lineal artesanal: Arreglo funcional (1D) y Matriz (2D)
 │   ├── ml/               Machine Learning propio: Regresión Lineal, KNN, K-Means y MLP (XOR)
@@ -36,6 +36,7 @@ Todas las carpetas del proyecto se encuentran organizadas en la raíz del reposi
 │   └── visitor.py        Intérprete Visitor desacoplado de ANTLR
 ├── tests/                Suite de 46 pruebas automatizadas con pytest (100% éxito)
 ├── .gitignore            Filtro de archivos temporales de Git
+├── COMO_CORRER.md        Guía rápida de ejecución paso a paso (Windows y Linux)
 ├── README.md             Documentación oficial y manual de sustentación
 └── requirements.txt      Dependencias mínimas de ejecución
 ```
@@ -292,62 +293,113 @@ Se verificó que el compilador capture y reporte con claridad las anomalías ló
 
 ---
 
-## GUÍA DE INSTALACIÓN Y EJECUCIÓN EN MÁQUINA VIRTUAL UBUNTU
+## GUÍA PASO A PASO: CÓMO CORRER CADA PARTE DEL PROYECTO
 
-Para ejecutar el proyecto en una máquina virtual Ubuntu Linux limpia, sigue estos pasos:
+> Para ver la guía completa e independiente con explicaciones adicionales y atajos, consulta también el archivo [`COMO_CORRER.md`](COMO_CORRER.md).
 
-### Instalación de dependencias del sistema y entorno
-```bash
-sudo apt update
-sudo apt install -y python3 python3-pip python3-venv default-jre
+### 1. Instalación de dependencias del entorno
+
+#### En Windows (PowerShell / CMD):
+```powershell
+# Crear y activar entorno virtual (opcional)
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+
+# Instalar dependencias mínimas
+pip install -r requirements.txt
 ```
 
-### Creación y activación del entorno virtual
+#### En Linux / Ubuntu:
 ```bash
+sudo apt update && sudo apt install -y python3 python3-pip python3-venv default-jre
 python3 -m venv venv
 source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-### Instalación del runtime de ANTLR y pytest
-```bash
-pip install antlr4-python3-runtime==4.13.2 pytest
-```
+---
 
-### Ejecución de la batería de pruebas
-```bash
-python3 -m pytest tests/
-```
+### 2. Ejecución de los 7 grimorios de ejemplo (.arc)
 
-### Ejecución de los ejemplos principales
+Todos los programas de Arcanum se ejecutan pasando la ruta del archivo `.arc` a `src/main.py`:
+
 ```bash
-# Ejemplo 1: Ventas comerciales
+# Ejemplo 1: Flujo de venta de boletos aéreos y destilación por destino
 python3 src/main.py examples/ejemplo1_analisis_ventas.arc
 
-# Ejemplo 2: Rendimiento académico
+# Ejemplo 2: Rendimiento académico agrupado por carrera universitaria
 python3 src/main.py examples/ejemplo2_rendimiento_estudiantil.arc
 
-# Ejemplo 3: Calidad ambiental
+# Ejemplo 3: Monitoreo ambiental de calidad del aire y PM2.5
 python3 src/main.py examples/ejemplo3_calidad_aire.arc
 
-# Ejemplo 4: Compendios y recetas
+# Ejemplo 4: Sistema de compendios y librerías propias ('usar compendio matematicas;')
 python3 src/main.py examples/ejemplo4_compendios_recetas.arc
 
-# Ejemplo 5: Caso de estudio final integrado (ML, matrices, gráficos y CSV/JSON)
+# Ejemplo 5: CASO DE ESTUDIO FINAL INTEGRADO (Corte 3: ML, Matrices, CSV/JSON y 4 PNGs)
 python3 src/main.py examples/ejemplo5_caso_estudio_final.arc
 
 # Ejemplo 6: Analítica de vuelos y retrasos con carga nativa en JSON
 python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc
 
-# Ejemplo 7: Casos de evaluación de tablero (Factorial, Sigmoide, MLP XOR, Data.xlsx EDA, Primos)
+# Ejemplo 7: Los 5 retos de sustentación en tablero del docente
+# (Factorial 5-100, Sigmoide, Red Neuronal MLP XOR, Lectura de Excel Data.xlsx con EDA, Números primos)
 python3 src/main.py examples/ejemplo7_casos_profesor.arc
-
-# Visualizar el árbol de análisis sintáctico
-python3 src/main.py examples/ejemplo1_analisis_ventas.arc --arbol
 ```
 
-### Verificación de errores semánticos controlados
+---
+
+### 3. Visualizar el árbol sintáctico (AST) en consola
+
+Para inspeccionar la estructura jerárquica del árbol de derivación de ANTLR4, añade el flag `--arbol`:
+
 ```bash
+python3 src/main.py examples/ejemplo1_analisis_ventas.arc --arbol
+python3 src/main.py examples/valido_asignaciones.arc --arbol
+```
+
+---
+
+### 4. Ejecución de la suite completa de pruebas automatizadas (46 pruebas)
+
+```bash
+# Correr las 46 pruebas automatizadas (100% éxito)
+python3 -m pytest tests/ -v
+
+# Correr únicamente las pruebas de la Entrega Final (Corte 3)
+python3 -m pytest tests/test_corte3.py -v
+
+# Correr pruebas unitarias del DataFrame artesanal (Pocion)
+python3 -m pytest tests/test_unitarias.py -v
+
+# Correr pruebas semánticas (validaciones lógicas)
+python3 -m pytest tests/test_semantica.py -v
+
+# Correr pruebas de integración de programas completos
+python3 -m pytest tests/test_integracion.py -v
+```
+
+---
+
+### 5. Verificación de errores semánticos controlados
+
+Para demostrarle al profesor cómo el analizador semántico captura anomalías con línea y columna:
+
+```bash
+# Variable no declarada
 python3 src/main.py examples/invalido_semantico_variable.arc
+
+# Columna inexistente en la tabla
 python3 src/main.py examples/invalido_semantico_columna.arc
+
+# Incompatibilidad de tipos de datos
 python3 src/main.py examples/invalido_semantico_tipo.arc
 ```
+
+---
+
+### 6. Ubicación de los artefactos generados
+
+Al ejecutar los grimorios, los resultados se guardan automáticamente en la carpeta `salidas/`:
+* **Gráficas PNG (300 DPI):** `1_grafica_barras_ciudades.png`, `2_grafica_lineas_ventas.png`, `3_grafica_dispersion.png`, `4_grafica_histograma_precios.png`, `5_grafica_retraso_aerolineas.png`, `6_grafica_sigmoide_tendencia.png`, `7_eda_pasajeros_excel.png`.
+* **Archivos CSV y JSON:** `resumen_caso_estudio_final.csv`, `resumen_caso_estudio_final.json`, `resumen_retrasos_aerolineas.json`, `resumen_ventas_ciudad.csv`.
