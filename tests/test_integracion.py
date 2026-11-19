@@ -20,12 +20,16 @@ class TestIntegracionProgramas:
 
     def test_ejecutar_valido_asignaciones(self):
         # Corre el ejemplo de variables básicas
-        ruta = os.path.join("examples", "valido_asignaciones.arc")
+        ruta = os.path.join("tests", "fixtures", "valido_asignaciones.arc")
+        if not os.path.exists(ruta):
+            ruta = os.path.join("examples", "valido_asignaciones.arc")
         assert ejecutar(ruta) is True
 
     def test_ejecutar_valido_completo(self):
         # Corre el ejemplo con todas las operaciones
-        ruta = os.path.join("examples", "valido_completo.arc")
+        ruta = os.path.join("tests", "fixtures", "valido_completo.arc")
+        if not os.path.exists(ruta):
+            ruta = os.path.join("examples", "valido_completo.arc")
         assert ejecutar(ruta) is True
 
     def test_ejecutar_programa1_ventas_y_verificar_csv(self):
@@ -42,28 +46,10 @@ class TestIntegracionProgramas:
         assert "ciudad" in pocion_exportada.columnas
         assert "ingreso_total" in pocion_exportada.columnas
 
-    def test_ejecutar_programa2_estudiantes_y_verificar_csv(self):
-        # Corre el caso de estudiantes y revisa el CSV exportado
-        ruta = os.path.join("examples", "ejemplo2_rendimiento_estudiantil.arc")
+    def test_ejecutar_ejemplo8_control_y_listas(self):
+        ruta = os.path.join("examples", "ejemplo8_control_y_listas.arc")
         assert ejecutar(ruta) is True
 
-        archivo_salida = os.path.join("salidas", "resumen_estudiantes.csv")
-        assert os.path.exists(archivo_salida) is True
-
-        pocion_exportada = Pocion.desde_csv(archivo_salida)
-        assert len(pocion_exportada) > 0
-        assert "carrera" in pocion_exportada.columnas
-        assert "promedio_general" in pocion_exportada.columnas
-
-    def test_ejecutar_programa3_calidad_aire_y_verificar_csv(self):
-        # Corre el caso ambiental y revisa las columnas exportadas
-        ruta = os.path.join("examples", "ejemplo3_calidad_aire.arc")
+    def test_ejecutar_ejemplo7_casos_profesor(self):
+        ruta = os.path.join("examples", "ejemplo7_casos_profesor.arc")
         assert ejecutar(ruta) is True
-
-        archivo_salida = os.path.join("salidas", "resumen_calidad_aire.csv")
-        assert os.path.exists(archivo_salida) is True
-
-        pocion_exportada = Pocion.desde_csv(archivo_salida)
-        assert len(pocion_exportada) > 0
-        assert "estacion" in pocion_exportada.columnas
-        assert "pm25_promedio" in pocion_exportada.columnas

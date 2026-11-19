@@ -22,15 +22,15 @@ Proyecto-LP-Final/
 │   └── main.py                 # Punto de entrada CLI con soporte de flags
 ├── grammar/                    # Gramática formal del lenguaje (Arcanum.g4)
 ├── generated/                  # Lexer, Parser y Visitor generados por ANTLR 4.13.2
-├── examples/                   # Programas .arc listos para ejecutar
+├── examples/                   # 3 programas .arc esenciales (control, datos y retos)
 ├── datos/                      # Datasets de entrada (CSV, JSON, Excel .xlsx)
 ├── csv/                        # Datasets alternativos compatibles
 ├── compendios/                 # Módulos y librerías reutilizables en Arcanum
 ├── salidas/                    # Tablas (.csv, .json) y gráficas (.png) exportadas
 ├── scripts/                    # Scripts de verificación automatizada del compilador
 ├── tests/                      # Suite de 64 pruebas unitarias y de integración (pytest)
-├── docs/                       # Guía breve (.docx), auditoría y documentación
-├── COMO_CORRER.md              # Guía exhaustiva de ejecución y sustentación
+├── docs/                       # Guía oficial y registros de verificación
+├── COMO_CORRER.md              # Guía rápida de comandos de ejecución
 ├── requirements.txt            # Dependencias mínimas
 └── README.md                   # Este archivo
 ```
@@ -71,29 +71,28 @@ Para auditar que todo el analizador y motor tabular funcionen al 100%:
 # 1. Ejecutar las 64 pruebas automáticas
 pytest -q
 
-# 2. Ejecutar el verificador de los 21 ejemplos
+# 2. Ejecutar el verificador de los ejemplos oficiales
 python3 scripts/verificar_ejemplos.py
 ```
 
-*Resultado esperado*: **64 passed in ~1s** y **21 ejemplos revisados con 0 fallos inesperados**.
+*Resultado esperado*: **64 passed in ~1s** y **3 ejemplos revisados con 0 fallos inesperados**.
 
 ---
 
-## Ruta Rápida de Estudio para Sustentación
+## Los 3 Ejemplos Oficiales de Arcanum
 
-Para no abrumarse con demasiados ejemplos, la **Guía Breve de Arcanum** sugiere revisar estos 4 programas clave:
+| Archivo | Enfoque Principal | Salida Obtenida |
+|---|---|---|
+| **`ejemplo8_control_y_listas.arc`** | Variables, condicionales `si / sino`, ciclo `mientras` con acumulador y listas. | Impresión clara en consola |
+| **`ejemplo1_analisis_ventas.arc`** | Pipeline ETL completo en CSV: imputación de nulos, filtros, subtotales y `destilar` por ciudad. | `salidas/resumen_ventas_ciudad.csv` |
+| **`ejemplo7_casos_profesor.arc`** | Los retos del profesor: Factorial con ciclo `mientras`, EDA de Excel y filtro de Primos. | `salidas/7_eda_pasajeros_excel.png` |
 
-1. **`examples/valido_asignaciones.arc`**: Asignación de variables, tipos básicos (enteros, decimales, texto, booleanos) y operaciones con precedencia.
-2. **`examples/ejemplo8_control_y_listas.arc`**: Toma de decisiones con `si/sino`, bucle `mientras` con acumulador y recorrido de listas con `para`.
-3. **`examples/ejemplo11_tablas_y_recetas.arc`**: Creación de tablas directas en código con `tabla(...)`, filtrado con `purificar`, cálculo con `transmutar` y resumen con `destilar`.
-4. **`examples/ejemplo7_casos_profesor.arc`**: Los ejercicios del profesor: Factorial de números grandes, análisis exploratorio de Excel (`Data.xlsx`) con gráfica y filtro de números primos.
-
-Para consultar el catálogo completo de ejemplos de negocio (ventas de aerolíneas, calidad del aire, multiformato JSON, matrices), consulta **[COMO_CORRER.md](COMO_CORRER.md)**.
+Para más detalles, consulta **[COMO_CORRER.md](COMO_CORRER.md)**.
 
 ---
 
-## Documentación y Sustentación
+## Documentación Oficial
 
 En la carpeta `docs/` se encuentra la documentación técnica:
-* **[manual_usuario.md](docs/manual_usuario.md)**: Guía de uso oficial con teoría, sintaxis, ejemplos y explicación del código.
-* **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema (64 tests y 21 ejemplos validados).
+* **[manual_usuario.md](docs/manual_usuario.md)**: Manual del usuario y referencia de sintaxis de Arcanum.
+* **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema.
