@@ -170,7 +170,7 @@ class TestIntegracionDSLCompleto:
 
     def test_dsl_invocar_excel_xlsx(self):
         codigo = """
-        datos = invocar desde "datos/Data.xlsx";
+        datos = invocar desde "datos/vuelos.xlsx";
         resumen = destilar datos por [aerolinea] agregar suma(pasajeros) como total_pasajeros;
         """
         tabla = ejecutar_codigo(codigo)

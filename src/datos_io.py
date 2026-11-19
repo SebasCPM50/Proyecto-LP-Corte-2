@@ -59,6 +59,14 @@ class ArchivosPocion:
         for p in posibles:
             if os.path.exists(p):
                 return p
+        # Búsqueda insensible a mayúsculas/minúsculas para compatibilidad en Linux
+        carpetas = [os.path.dirname(ruta) or ".", "datos", "csv", os.path.join("..", "datos"), os.path.join("..", "csv")]
+        nombre_lower = nombre_archivo.lower()
+        for c in carpetas:
+            if os.path.isdir(c):
+                for f in os.listdir(c):
+                    if f.lower() == nombre_lower:
+                        return os.path.join(c, f)
         return ruta
 
     @classmethod

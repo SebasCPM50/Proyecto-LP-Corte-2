@@ -17,7 +17,7 @@ revelar fact_10;
 
 
 # 2. Leer una tabla, describirla y graficarla.
-datos_excel = invocar desde "datos/Data.xlsx";
+datos_excel = invocar desde "datos/vuelos.xlsx";
 
 # Revelación tabular y resumen exploratorio (conteo, media, std, min, max)
 revelar datos_excel;
@@ -27,7 +27,7 @@ describir datos_excel;
 forjar artefacto barras desde datos_excel con
     eje_x aerolinea,
     eje_y pasajeros,
-    titulo "EDA: Pasajeros por Aerolinea desde Data.xlsx",
+    titulo "EDA: Pasajeros por Aerolinea desde vuelos.xlsx",
     salida "salidas/7_eda_pasajeros_excel.png";
 
 
