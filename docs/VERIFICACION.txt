@@ -1,0 +1,40 @@
+VERIFICACION DE LA ENTREGA ARCANUM
+Fecha de entrega: 18 de noviembre de 2026
+Entorno: macOS; Python 3.15.2; ANTLR runtime 4.13.2
+Pruebas ejecutadas desde una extracción limpia del ZIP.
+
+python -m pytest -q
+........................................................................ [ 88%]
+.........                                                                [100%]
+81 passed in 2.13s
+
+python scripts/verificar_ejemplos.py
+OK ejemplo10_ml_paso_a_paso.arc
+OK ejemplo11_tablas_y_recetas.arc
+OK ejemplo1_analisis_ventas.arc
+OK ejemplo2_rendimiento_estudiantil.arc
+OK ejemplo3_calidad_aire.arc
+OK ejemplo4_compendios_recetas.arc
+OK ejemplo5_caso_estudio_final.arc
+OK ejemplo6_analisis_vuelos_json.arc
+OK ejemplo7_casos_profesor.arc
+OK ejemplo8_control_y_listas.arc
+OK ejemplo9_estructuras_funcionales.arc
+OK invalido_lexico.arc
+OK invalido_lexico_caracter.arc
+OK invalido_semantico_columna.arc
+OK invalido_semantico_tipo.arc
+OK invalido_semantico_variable.arc
+OK invalido_sintactico.arc
+OK invalido_sintactico_recolectar.arc
+OK valido_asignaciones.arc
+OK valido_carga_seleccion.arc
+OK valido_completo.arc
+OK valido_filtro_avanzado.arc
+
+22 ejemplos revisados; 0 fallos inesperados
+
+Opción --arbol: comprobada.
+Código de las 13 secciones prácticas del manual: ejecutado correctamente.
+Manual Word: 24 páginas renderizadas e inspeccionadas; sin recortes ni desbordamientos.
+Los comandos Windows se documentaron, pero no se probaron en una sesión Windows.

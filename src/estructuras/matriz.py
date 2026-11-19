@@ -9,7 +9,7 @@ class Matriz:
     """
     Representa una matriz bidimensional de números.
     Soporta operaciones de álgebra lineal: suma, resta, transpuesta,
-    multiplicación matricial y estimación por mínimos cuadrados.
+    multiplicación matricial y conversión desde tablas.
     """
 
     def __init__(self, datos):
@@ -26,6 +26,8 @@ class Matriz:
         else:
             raise TypeError("Los datos de la matriz deben ser una colección bidimensional o lista de filas")
 
+        if self.filas_datos and any(len(f) != len(self.filas_datos[0]) for f in self.filas_datos):
+            raise ValueError("Todas las filas de una matriz deben tener igual longitud")
         self.filas = len(self.filas_datos)
         self.columnas = len(self.filas_datos[0]) if self.filas > 0 else 0
 
@@ -121,13 +123,15 @@ class Matriz:
         """
         Extrae las columnas numéricas solicitadas de una Poción y construye una Matriz.
         """
+        if any(c not in pocion.columnas for c in columnas):
+            raise ValueError("La tabla no contiene todas las columnas solicitadas")
         filas_matriz = []
         for fila in pocion.filas:
             fila_num = []
             for col in columnas:
                 val = fila.get(col)
                 if val is None or not isinstance(val, (int, float)):
-                    fila_num.append(0.0)
+                    raise ValueError(f"La columna {col} contiene un valor nulo o no numérico; sana los datos primero")
                 else:
                     fila_num.append(float(val))
             filas_matriz.append(fila_num)

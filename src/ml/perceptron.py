@@ -10,6 +10,7 @@ Arquitectura:
 
 import math
 import random
+from ml.validacion import positivo_entero, matriz, vector
 
 
 def _sigmoide(x):
@@ -30,6 +31,13 @@ class PerceptronMulticapa:
     """
 
     def __init__(self, n_entrada=2, n_oculta=2, n_salida=1, tasa_aprendizaje=1.0, epocas=4000):
+        positivo_entero(n_entrada, "n_entrada")
+        positivo_entero(n_oculta, "n_oculta")
+        positivo_entero(epocas, "epocas")
+        if n_salida != 1:
+            raise ValueError("Este MLP admite una salida binaria")
+        if not math.isfinite(tasa_aprendizaje) or tasa_aprendizaje <= 0:
+            raise ValueError("La tasa de aprendizaje debe ser positiva y finita")
         self.n_entrada = n_entrada
         self.n_oculta = n_oculta
         self.n_salida = n_salida
@@ -44,30 +52,22 @@ class PerceptronMulticapa:
         self.b2 = [semilla_local.uniform(-1.0, 1.0) for _ in range(n_salida)]
 
         self.historial_perdida = []
+        self.historial_epocas = []
         self.entrenado = False
 
     def entrenar(self, X, y):
         """Entrena los pesos de la red usando el algoritmo de backpropagation."""
-        X_datos = []
-        for fila in X:
-            if hasattr(fila, "a_lista"):
-                X_datos.append([float(v) for v in fila.a_lista()])
-            elif isinstance(fila, (list, tuple)):
-                X_datos.append([float(v) for v in fila])
-            else:
-                X_datos.append([float(fila)])
-
-        y_datos = []
-        for fila in y:
-            if isinstance(fila, (list, tuple)):
-                y_datos.append([float(v) for v in fila])
-            elif hasattr(fila, "a_lista"):
-                y_datos.append([float(v) for v in fila.a_lista()])
-            else:
-                y_datos.append([float(fila)])
-
+        X_datos = matriz(X)
+        y_datos = matriz(y)
+        if len(X_datos) != len(y_datos):
+            raise ValueError("X e y deben tener igual número de muestras")
+        if len(X_datos[0]) != self.n_entrada:
+            raise ValueError("Dimensión de entrada incorrecta")
+        if any(len(f) != 1 or f[0] not in (0, 1) for f in y_datos):
+            raise ValueError("El MLP necesita etiquetas binarias 0 o 1")
         N = len(X_datos)
         self.historial_perdida = []
+        self.historial_epocas = []
 
         for epoca in range(self.epocas):
             error_acumulado = 0.0
@@ -116,6 +116,7 @@ class PerceptronMulticapa:
                     self.b1[j] -= self.tasa * delta_oculta[j]
 
             if epoca % 100 == 0 or epoca == self.epocas - 1:
+                self.historial_epocas.append(epoca + 1)
                 self.historial_perdida.append(round(error_acumulado / N, 5))
 
         self.entrenado = True
@@ -123,12 +124,11 @@ class PerceptronMulticapa:
 
     def predecir_probabilidad(self, punto):
         """Retorna la probabilidad continua (0.0 a 1.0) predicha por la neurona de salida."""
-        if hasattr(punto, "a_lista"):
-            xi = [float(v) for v in punto.a_lista()]
-        elif isinstance(punto, (list, tuple)):
-            xi = [float(v) for v in punto]
-        else:
-            xi = [float(punto)]
+        if not self.entrenado:
+            raise RuntimeError("El MLP no ha sido entrenado")
+        xi = vector(punto)
+        if len(xi) != self.n_entrada:
+            raise ValueError("La predicción debe tener la misma dimensión que el entrenamiento")
 
         oculta = [_sigmoide(self.b1[j] + sum(xi[k] * self.w1[k][j] for k in range(self.n_entrada)))
                   for j in range(self.n_oculta)]
@@ -144,7 +144,7 @@ class PerceptronMulticapa:
     def a_pocion_perdida(self):
         """Convierte el historial de pérdida a una Poción para graficarla como serie de líneas."""
         from pocion import Pocion
-        filas = [{"epoca": idx * 100, "perdida": err} for idx, err in enumerate(self.historial_perdida)]
+        filas = [{"epoca": epoca, "perdida": err} for epoca, err in zip(self.historial_epocas, self.historial_perdida)]
         return Pocion(["epoca", "perdida"], filas)
 
     def __repr__(self):

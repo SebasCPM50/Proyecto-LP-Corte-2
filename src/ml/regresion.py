@@ -5,6 +5,9 @@ Calcula la recta de mejor ajuste y = m*x + b mediante el método de mínimos cua
 """
 
 
+from ml.validacion import vector
+
+
 class RegresionLineal:
     """
     Modelo supervisado de predicción continua.
@@ -23,8 +26,8 @@ class RegresionLineal:
         m = (N * sum(xy) - sum(x)*sum(y)) / (N * sum(x^2) - (sum(x))^2)
         b = mean(y) - m * mean(x)
         """
-        x_vals = [float(v) for v in x]
-        y_vals = [float(v) for v in y]
+        x_vals = vector(x)
+        y_vals = vector(y)
         n = len(x_vals)
 
         if n < 2 or n != len(y_vals):
@@ -57,7 +60,7 @@ class RegresionLineal:
         """Predice el valor de y para un nuevo valor escalar de x."""
         if not self.esta_entrenado:
             raise RuntimeError("El modelo de regresión no ha sido entrenado todavía")
-        return round(self.pendiente_m * float(nuevo_x) + self.intercepto_b, 4)
+        return round(self.pendiente_m * vector([nuevo_x])[0] + self.intercepto_b, 4)
 
     def predecir_lote(self, lista_x):
         """Predice para una lista de valores de x."""

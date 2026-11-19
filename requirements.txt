@@ -1,10 +1,7 @@
-# =============================================================================
-# Dependencias mínimas del proyecto Arcanum
-# NO UTILIZA PANDAS, NUMPY NI NINGUNA LIBRERÍA DE CIENCIA DE DATOS EXTERNA.
-# Todo el procesamiento tabular, filtrado, ordenamiento y estadísticas fue
-# implementado 100% desde cero en Python nativo (src/pocion.py).
-# =============================================================================
-antlr4-python3-runtime>=4.13.0
-pytest>=7.0.0
-matplotlib>=3.7.0  # Empleado exclusivamente en src/visualizacion/ para exportar los artefactos a imágenes PNG (Corte 3)
-openpyxl>=3.1.0    # Opcional: Para lectura directa de hojas de cálculo Excel (.xlsx) sin Pandas
+# ANTLR debe coincidir con el generador incluido.
+antlr4-python3-runtime==4.13.2
+pytest>=7,<10
+# Solo se usan para gráficos y lectura Excel, respectivamente.
+# Matplotlib instala NumPy como dependencia indirecta; el motor y ML no lo importan.
+matplotlib>=3.7,<4
+openpyxl>=3.1,<4

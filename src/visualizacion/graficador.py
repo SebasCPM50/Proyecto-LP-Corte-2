@@ -39,6 +39,9 @@ class GraficadorArcanum:
         color_final = color if color else cls.PALETA_COLORES.get(tipo_normalizado, "#2B6CB0")
         titulo_final = titulo if titulo else f"Gráfica de {tipo_normalizado.capitalize()}"
 
+        requeridos = [eje_x, eje_y] if tipo_normalizado in ("barras", "barra", "bar", "lineas", "linea", "line", "dispersion", "scatter", "puntos") else [eje_x or eje_y or (pocion.columnas[0] if pocion.columnas else None)]
+        if not pocion.filas or any(c not in pocion.columnas for c in requeridos):
+            raise ValueError("La gráfica necesita datos y ejes que existan en la tabla")
         plt.figure(figsize=(9, 5))
         plt.grid(True, linestyle="--", alpha=0.5, zorder=1)
 
@@ -53,8 +56,8 @@ class GraficadorArcanum:
 
         # 2. Gráfica de Líneas
         elif tipo_normalizado in ["lineas", "linea", "line"]:
-            valores_x = [str(f.get(eje_x, "")) for f in pocion.filas]
-            valores_y = [float(f.get(eje_y, 0.0)) for f in pocion.filas]
+            valores_x = [f[eje_x] for f in pocion.filas]
+            valores_y = [float(f[eje_y]) for f in pocion.filas]
             plt.plot(valores_x, valores_y, marker="o", color=color_final, linewidth=2, zorder=3)
             plt.xlabel(eje_x if eje_x else "X")
             plt.ylabel(eje_y if eje_y else "Y")

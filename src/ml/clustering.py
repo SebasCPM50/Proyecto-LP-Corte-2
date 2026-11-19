@@ -5,6 +5,7 @@ Agrupa datos multidimensionales en K grupos calculando centroides de forma itera
 """
 
 import math
+from ml.validacion import positivo_entero, matriz
 
 
 class KMediasClustering:
@@ -14,8 +15,8 @@ class KMediasClustering:
     """
 
     def __init__(self, k=2, max_iter=30):
-        self.k = int(k)
-        self.max_iter = int(max_iter)
+        self.k = positivo_entero(k, "k")
+        self.max_iter = positivo_entero(max_iter, "max_iter")
         self.centroides = []
         self.asignaciones = []
         self.esta_entrenado = False
@@ -29,12 +30,7 @@ class KMediasClustering:
         Ejecuta el algoritmo de agrupamiento K-Means sobre una lista de vectores numéricos.
         Retorna la lista de asignaciones de cluster para cada punto.
         """
-        matriz_puntos = [
-            [float(v) for v in fila]
-            if hasattr(fila, "__iter__") and not isinstance(fila, (str, bytes))
-            else [float(fila)]
-            for fila in datos
-        ]
+        matriz_puntos = matriz(datos)
         n = len(matriz_puntos)
         if n < self.k:
             raise ValueError(f"No hay suficientes datos ({n}) para formar K={self.k} grupos")
@@ -46,7 +42,7 @@ class KMediasClustering:
         self.centroides = [list(matriz_puntos[min(i * paso, n - 1)]) for i in range(self.k)]
 
         # 2. Bucle iterativo de convergencia
-        self.asignaciones = [0] * n
+        self.asignaciones = [-1] * n
         for _ in range(self.max_iter):
             hubo_cambios = False
 
@@ -86,9 +82,11 @@ class KMediasClustering:
         y devuelve una nueva Poción con la columna de cluster añadida.
         """
         from pocion import Pocion
+        if not columnas or any(c not in pocion.columnas for c in columnas):
+            raise ValueError("Indica columnas existentes para K-Means")
         puntos = []
         for fila in pocion.filas:
-            puntos.append([fila.get(c, 0.0) for c in columnas])
+            puntos.append([fila.get(c) for c in columnas])
 
         etiquetas_cluster = self.agrupar(puntos)
 

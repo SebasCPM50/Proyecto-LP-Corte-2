@@ -17,8 +17,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "generated"))
 
-from antlr4 import FileStream, CommonTokenStream
-from ArcanumLexer import ArcanumLexer
+from analizador import analizar_archivo
 from ArcanumParser import ArcanumParser
 from errores import ManejadorErrores, ErrorSemantico
 from tabla_simbolos import TablaSimbolos
@@ -42,7 +41,7 @@ def imprimir_arbol(nodo, parser, sangria=0):
         print(f"{prefijo}'{nodo.getText()}'")
 
 
-def ejecutar(ruta_archivo, mostrar_arbol=False):
+def ejecutar(ruta_archivo, mostrar_arbol=False, max_iteraciones=10000):
     """
     Acá orquestamos todo el proceso desde abrir el archivo hasta ejecutar el código
     """
@@ -51,31 +50,12 @@ def ejecutar(ruta_archivo, mostrar_arbol=False):
         print(f"[Error]: El archivo '{ruta_archivo}' no existe")
         return False
 
-    # Leemos el archivo en texto UTF-8 con ANTLR
-    entrada = FileStream(ruta_archivo, encoding="utf-8")
-
-    # Paso 1: Análisis Léxico (dividimos el texto en tokens)
-    lexer = ArcanumLexer(entrada)
-    manejador_lexico = ManejadorErrores()
-    lexer.removeErrorListeners()
-    lexer.addErrorListener(manejador_lexico)
-
-    tokens = CommonTokenStream(lexer)
-
-    # Paso 2: Análisis Sintáctico (construimos el árbol siguiendo la gramática)
-    parser = ArcanumParser(tokens)
-    manejador_sintactico = ManejadorErrores()
-    parser.removeErrorListeners()
-    parser.addErrorListener(manejador_sintactico)
-
-    arbol = parser.programa()
-
-    # Si hubo algún fallo de sintaxis o palabras mal escritas paramos de una vez
-    if manejador_lexico.hay_errores() or manejador_sintactico.hay_errores():
-        print(f"[Falló el análisis] El archivo '{ruta_archivo}' contiene errores sintácticos o léxicos:")
-        manejador_lexico.imprimir()
-        manejador_sintactico.imprimir()
+    try:
+        arbol = analizar_archivo(ruta_archivo)
+    except (ErrorSemantico, OSError, UnicodeError) as error:
+        print(error)
         return False
+    parser = ArcanumParser
 
     print(f"EJECUTANDO GRIMORIO: {ruta_archivo}")
 
@@ -88,7 +68,7 @@ def ejecutar(ruta_archivo, mostrar_arbol=False):
 
     # Paso 3: Análisis Semántico y Ejecución con nuestro Visitor
     tabla = TablaSimbolos()
-    visitor = ArcanumVisitorEjecutor(tabla)
+    visitor = ArcanumVisitorEjecutor(tabla, max_iteraciones)
 
     try:
         # Recorremos el árbol y ejecutamos cada hechizo
@@ -106,20 +86,18 @@ def ejecutar(ruta_archivo, mostrar_arbol=False):
         return False
 
 
+def cli():
+    import argparse
+    parser = argparse.ArgumentParser(description="Ejecuta programas del lenguaje Arcanum")
+    parser.add_argument("archivo", help="Ruta del programa .arc")
+    parser.add_argument("--arbol", action="store_true", help="Muestra el árbol sintáctico")
+    parser.add_argument("--max-iteraciones", type=int, default=10000,
+                        help="Límite por bucle mientras (por defecto 10000)")
+    args = parser.parse_args()
+    if args.max_iteraciones <= 0:
+        parser.error("--max-iteraciones debe ser positivo")
+    return 0 if ejecutar(args.archivo, args.arbol, args.max_iteraciones) else 1
+
+
 if __name__ == "__main__":
-    # Revisamos que nos hayan pasado el nombre del archivo por consola
-    if len(sys.argv) < 2:
-        print("Uso: python3 main.py <archivo.arc> [--arbol]")
-        sys.exit(1)
-
-    argumentos = sys.argv[1:]
-    ver_arbol = "--arbol" in argumentos
-    rutas = [arg for arg in argumentos if not arg.startswith("--")]
-
-    if not rutas:
-        print("Uso: python3 main.py <archivo.arc> [--arbol]")
-        sys.exit(1)
-
-    ruta = rutas[0]
-    exito = ejecutar(ruta, mostrar_arbol=ver_arbol)
-    sys.exit(0 if exito else 1)
+    sys.exit(cli())

@@ -1,4 +1,4 @@
-# Generated from C:/Users/sebas/.gemini/antigravity/scratch/repo_clone/grammar/Arcanum.g4 by ANTLR 4.13.2
+# Generated from Arcanum.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .ArcanumParser import ArcanumParser
@@ -189,6 +189,11 @@ class ArcanumVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by ArcanumParser#condicionValor.
+    def visitCondicionValor(self, ctx:ArcanumParser.CondicionValorContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by ArcanumParser#condicionNo.
     def visitCondicionNo(self, ctx:ArcanumParser.CondicionNoContext):
         return self.visitChildren(ctx)
@@ -241,6 +246,11 @@ class ArcanumVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by ArcanumParser#booleano.
     def visitBooleano(self, ctx:ArcanumParser.BooleanoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by ArcanumParser#negativo.
+    def visitNegativo(self, ctx:ArcanumParser.NegativoContext):
         return self.visitChildren(ctx)
 
 

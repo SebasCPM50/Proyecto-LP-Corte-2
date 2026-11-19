@@ -26,6 +26,42 @@ class ArcanumListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ArcanumParser#instruccionSi.
+    def enterInstruccionSi(self, ctx:ArcanumParser.InstruccionSiContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#instruccionSi.
+    def exitInstruccionSi(self, ctx:ArcanumParser.InstruccionSiContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#instruccionMientras.
+    def enterInstruccionMientras(self, ctx:ArcanumParser.InstruccionMientrasContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#instruccionMientras.
+    def exitInstruccionMientras(self, ctx:ArcanumParser.InstruccionMientrasContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#instruccionPara.
+    def enterInstruccionPara(self, ctx:ArcanumParser.InstruccionParaContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#instruccionPara.
+    def exitInstruccionPara(self, ctx:ArcanumParser.InstruccionParaContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#bloqueHechizos.
+    def enterBloqueHechizos(self, ctx:ArcanumParser.BloqueHechizosContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#bloqueHechizos.
+    def exitBloqueHechizos(self, ctx:ArcanumParser.BloqueHechizosContext):
+        pass
+
+
     # Enter a parse tree produced by ArcanumParser#asignacion.
     def enterAsignacion(self, ctx:ArcanumParser.AsignacionContext):
         pass
@@ -296,6 +332,15 @@ class ArcanumListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ArcanumParser#condicionValor.
+    def enterCondicionValor(self, ctx:ArcanumParser.CondicionValorContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#condicionValor.
+    def exitCondicionValor(self, ctx:ArcanumParser.CondicionValorContext):
+        pass
+
+
     # Enter a parse tree produced by ArcanumParser#condicionNo.
     def enterCondicionNo(self, ctx:ArcanumParser.CondicionNoContext):
         pass
@@ -395,12 +440,48 @@ class ArcanumListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by ArcanumParser#negativo.
+    def enterNegativo(self, ctx:ArcanumParser.NegativoContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#negativo.
+    def exitNegativo(self, ctx:ArcanumParser.NegativoContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#indexacion.
+    def enterIndexacion(self, ctx:ArcanumParser.IndexacionContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#indexacion.
+    def exitIndexacion(self, ctx:ArcanumParser.IndexacionContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#listaLit.
+    def enterListaLit(self, ctx:ArcanumParser.ListaLitContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#listaLit.
+    def exitListaLit(self, ctx:ArcanumParser.ListaLitContext):
+        pass
+
+
     # Enter a parse tree produced by ArcanumParser#identificador.
     def enterIdentificador(self, ctx:ArcanumParser.IdentificadorContext):
         pass
 
     # Exit a parse tree produced by ArcanumParser#identificador.
     def exitIdentificador(self, ctx:ArcanumParser.IdentificadorContext):
+        pass
+
+
+    # Enter a parse tree produced by ArcanumParser#listaLiteral.
+    def enterListaLiteral(self, ctx:ArcanumParser.ListaLiteralContext):
+        pass
+
+    # Exit a parse tree produced by ArcanumParser#listaLiteral.
+    def exitListaLiteral(self, ctx:ArcanumParser.ListaLiteralContext):
         pass
 
 

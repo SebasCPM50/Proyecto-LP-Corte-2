@@ -1,405 +1,106 @@
-# PROYECTO ARCANUM — DOCUMENTO OFICIAL DE ENTREGA Y SUSTENTACIÓN
-# DSL DE CIENCIA DE DATOS CON TEMÁTICA ALQUÍMICA
-# ASIGNATURA: LENGUAJES DE PROGRAMACIÓN Y TRANSDUCCIÓN
-# DOCENTE: JOAQUÍN F. SÁNCHEZ
-# UNIVERSIDAD SERGIO ARBOLEDA
+# Arcanum: Lenguaje de Dominio Específico (DSL) para Ciencia de Datos y Machine Learning
 
-### INFORMACIÓN DEL PROYECTO
-* **Nombre del Lenguaje**: Arcanum
-* **Paradigma**: Declarativo, funcional y analítico (orientado a procesamiento de datos)
-* **Entregas integradas**: Entrega 1 (Gramática y Front-end) + Entrega 2 (Semántica, Motor Artesanal, Intérprete) + Entrega 3 y Final (Visualización PNG, Machine Learning, Matrices, Control de Flujo y Desacople Modular)
-* **Condición estricta**: Cero librerías externas de ciencia de datos (Pandas y NumPy fueron creados 100% desde cero de forma artesanal)
+**Arcanum** es un lenguaje de dominio específico (DSL) diseñado para la manipulación tabular, análisis exploratorio de datos (EDA), programación funcional, transformaciones matriciales y experimentación con algoritmos de Machine Learning desde cero. 
+
+Su compilador/intérprete está implementado en **Python 3** utilizando **ANTLR4** para el análisis léxico y sintáctico, y ejecuta directamente sobre el Árbol de Análisis Sintáctico mediante el patrón *Visitor* modularizado.
 
 ---
 
-## ESTRUCTURA DEL REPOSITORIO Y ORGANIZACIÓN DE CARPETAS
+## Estructura del Repositorio
 
-Todas las carpetas del proyecto se encuentran organizadas en la raíz del repositorio para facilitar su navegación directa:
+El proyecto está organizado de forma limpia en la raíz del repositorio:
 
 ```
-├── compendios/           Librerías propias escritas en Arcanum (.arc)
-├── csv/                  Datasets tabulares de prueba (CSV y JSON)
-├── datos/                Datasets principales (vuelos.csv, vuelos.json, ventas.csv, etc.)
-├── docs/                 Guía maestra de estudio y sustentación oral (.docx)
-├── examples/             Grimorios (.arc) con casos de uso reales y pruebas completas
-├── generated/            Parser, Lexer y Visitor autogenerados por ANTLR4
-├── grammar/              Gramática formal de Arcanum (Arcanum.g4)
-├── salidas/              Artefactos generados: 7 gráficas PNG y exportaciones CSV / JSON
-├── src/                  Código fuente del compilador e intérprete en Python
-│   ├── estructuras/      Álgebra lineal artesanal: Arreglo funcional (1D) y Matriz (2D)
-│   ├── ml/               Machine Learning propio: Regresión Lineal, KNN, K-Means y MLP (XOR)
-│   ├── visualizacion/    Motor gráfico desacoplado para exportación a PNG
-│   ├── main.py           Punto de entrada de línea de comandos del lenguaje
-│   ├── motor.py          Fachada analítica (Patrón GoF Facade)
-│   ├── pocion.py         DataFrame artesanal inmutable (Pandas propio) con soporte CSV, JSON y Excel
-│   ├── tabla_simbolos.py Libreta de memoria, tipos y ámbitos
-│   └── visitor.py        Intérprete Visitor desacoplado de ANTLR
-├── tests/                Suite de 46 pruebas automatizadas con pytest (100% éxito)
-├── .gitignore            Filtro de archivos temporales de Git
-├── COMO_CORRER.md        Guía rápida de ejecución paso a paso (Windows y Linux)
-├── README.md             Documentación oficial y manual de sustentación
-└── requirements.txt      Dependencias mínimas de ejecución
+Proyecto-LP-Final/
+├── src/                        # Núcleo del intérprete y compilador
+│   ├── runtime/                # Control de flujo, expresiones, recetas, ámbitos y nativas
+│   ├── estructuras/            # Arreglo y Matriz (álgebra lineal)
+│   ├── ml/                     # Regresión, KNN, K-Means, Perceptrón Multicapa y validación
+│   ├── visualizacion/          # Motor de artefactos gráficos PNG (Matplotlib sin GUI)
+│   ├── motor.py                # Fachada central de operaciones de datos
+│   ├── pocion.py               # Motor tabular nativo en memoria (Pocion)
+│   ├── datos_io.py             # Lectura y guardado de archivos (CSV, JSON, Excel .xlsx)
+│   └── main.py                 # Punto de entrada CLI con soporte de flags
+├── grammar/                    # Gramática formal del lenguaje (Arcanum.g4)
+├── generated/                  # Lexer, Parser y Visitor generados por ANTLR 4.13.2
+├── examples/                   # 22 programas .arc (15 válidos y 7 de prueba de errores)
+├── datos/                      # Datasets de entrada (CSV, JSON, Excel .xlsx)
+├── csv/                        # Datasets alternativos compatibles
+├── compendios/                 # Módulos y librerías reutilizables en Arcanum
+├── salidas/                    # Tablas (.csv, .json) y gráficas (.png) exportadas
+├── scripts/                    # Scripts de verificación automatizada del compilador
+├── tests/                      # Suite de 81 pruebas unitarias y de integración (pytest)
+├── docs/                       # Manual completo (.docx), cambios y documentación
+├── COMO_CORRER.md              # Guía exhaustiva de ejecución y sustentación
+├── requirements.txt            # Dependencias mínimas
+└── README.md                   # Este archivo
 ```
 
 ---
 
-## RESUMEN DEL ALCANCE Y CONCEPTO
+## Instalación y Primeros Pasos
 
-Arcanum es un lenguaje de dominio específico (DSL) diseñado para analistas y científicos de datos que buscan realizar preparación, limpieza, filtrado, transformación y agregación estadística sobre conjuntos de datos tabulares.
+El repositorio ya contiene los archivos generados por ANTLR en `generated/`, por lo que **no necesitas Java instalado**.
 
-El lenguaje adopta una metáfora alquímica coherente donde:
-* Un conjunto de datos (DataFrame) es una **Poción**
-* Una columna o campo es un **Ingrediente**
-* Un archivo de código o script es un **Grimorio**
-* Una función reutilizable es una **Receta**
-* Una librería de funciones propias es un **Compendio**
-
-### Mapeo de Operaciones de Ciencia de Datos
-
-| Operación estándar de datos | Término en Arcanum | Propósito analítico |
-| :--- | :--- | :--- |
-| `read_csv` / `json` / `excel` | `invocar desde "ruta.csv"` / `".json"` / `".xlsx"` | Carga archivos CSV, JSON o Excel (.xlsx) desde disco con detección automática |
-| `select` | `recolectar [col1, col2] de tabla` | Proyección: conserva únicamente las columnas pedidas |
-| `filter` / `where` | `purificar tabla donde (condicion)` | Filtrado: conserva las filas que cumplen el predicado booleano |
-| `sort_values` | `ordenar tabla por col [asc/desc]` | Ordenamiento de registros por una columna |
-| `mutate` / calcular | `transmutar tabla con nuevo = formula` | Crea una columna calculada fila por fila |
-| `dropna` | `sanar tabla descartar_nulos` | Limpieza: descarta filas que tengan celdas vacías |
-| `fillna` | `sanar tabla llenar col con valor` | Imputación: rellena valores nulos con un valor por defecto |
-| `group_by` + `aggregate` | `destilar tabla agrupar [cols] agregando [...]` | Agrupación y cálculo de métricas (suma, media, mediana, std, min, max, contar) |
-| `describe` | `describir tabla` | Genera una tabla con estadísticas de columnas numéricas |
-| `print` | `revelar tabla` | Muestra la tabla en consola sin recortar filas |
-| `to_csv` / `to_json` | `preservar tabla en "ruta.csv"` / `"ruta.json"` | Exporta la tabla transformada a un archivo CSV o JSON en disco |
-| `random` / muestreo | `random(min, max)` / `muestra_aleatoria(n)` | Generación de números aleatorios y muestreo de filas sin librerías |
-| `if` / `else` | `si (condicion) { ... } sino { ... }` | Control de flujo condicional |
-| `while` | `mientras (condicion) { ... }` | Bucle iterativo de repetición |
-| `matrix` (NumPy) | `matriz([[1, 2], [3, 4]])` / `transpuesta(m)` | Álgebra lineal pura: suma, multiplicación matricial y transpuesta |
-| `list` / vector | `[elem1, elem2, elem3]` | Estructura de Arreglo funcional con map, filter y reduce |
-| `linear_regression` | `regresion(x, y)` / `predecir(modelo, x)` | Machine Learning: Predicción continua por mínimos cuadrados |
-| `knn_classifier` | `knn(datos, etiquetas, k)` / `predecir(m, p)` | Machine Learning: Clasificación por distancia euclidiana |
-| `kmeans_clustering`| `kmeans(pocion, [col1, col2], k)` | Machine Learning: Agrupamiento no supervisado con centroides |
-| `mlp_xor` (Neural Net)| `mlp(X, y)` / `predecir(modelo, p)` | Machine Learning: Perceptrón Multicapa para clasificación no lineal (XOR) |
-| `plot` (Matplotlib) | `forjar artefacto barras/lineas/...` | Motor de visualización: genera y exporta gráficas a PNG |
-| `import` propio | `usar compendio nombre` | Carga una librería propia escrita en Arcanum |
-| `function` | `receta nombre(param) { ... devolver x; }` | Define y ejecuta funciones propias con memoria local |
-
----
-
-## ARQUITECTURA ARTESANAL: CERO LIBRERÍAS EXTERNAS
-
-Por requisito estricto de la asignatura, el proyecto no utiliza Pandas, NumPy ni el módulo csv estándar de Python. Todo el motor analítico fue construido desde cero utilizando únicamente los tipos de datos nativos de Python:
-
-### Estructura de la Poción (src/pocion.py)
-* `self.columnas`: Lista de nombres de columnas (`list[str]`)
-* `self.filas`: Lista de diccionarios nativos (`list[dict[str, Any]]`)
-
-```
-Objeto Pocion
-├── self.columnas = ['fecha', 'ciudad', 'precio']
-└── self.filas = [
-      {'fecha': '2026-01-05', 'ciudad': 'Miami',  'precio': 320},
-      {'fecha': '2026-01-06', 'ciudad': 'Madrid', 'precio': 680}
-    ]
+### En Linux / macOS
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
-### Principio de Inmutabilidad Alquímica
-Cada operación de transformación (`recolectar`, `purificar`, `ordenar`, `transmutar`, `sanar`, `destilar`, `muestra_aleatoria`) genera y retorna una **Poción completamente nueva**, garantizando que el conjunto de datos original permanezca intacto y permitiendo encadenar análisis sin efectos secundarios no deseados.
-
----
-
-## MECÁNICA DE CARGA Y LECTURA DE ARCHIVOS CSV
-
-### Proceso en el código (`Pocion.desde_csv`)
-* **Apertura del archivo físico**: Utiliza la función nativa `open(ruta, mode='r', encoding='utf-8')`
-* **Lectura de líneas**: Extrae el contenido en memoria con `.readlines()` y elimina renglones vacíos
-* **Extracción de cabeceras**: Toma la primera línea (`lineas[0]`), la limpia con `.strip()` y la divide por comas mediante `.split(',')`
-* **Inferencia automática de tipos (`_convertir_tipo_dato`)**:
-  * Si la celda está vacía o dice `"NaN"`, `"NULL"`, `"NONE"` $\rightarrow$ la convierte a `None`
-  * Si dice `"verdadero"` o `"true"` $\rightarrow$ `True`
-  * Si dice `"falso"` o `"false"` $\rightarrow$ `False`
-  * Si contiene dígitos enteros $\rightarrow$ `int`
-  * Si contiene formato decimal $\rightarrow$ `float`
-  * Si es texto $\rightarrow$ elimina comillas exteriores y lo deja limpio
-* **Estructuración en diccionarios**: Por cada línea crea un diccionario emparejando cada columna con su valor tipado
-* **Almacenamiento**: Genera la instancia `Pocion(cabecera, filas)` y la registra en la Tabla de Símbolos
-
-### Explicación conceptual sobre la carga de CSV
-> *"Profesor, construimos nuestro propio analizador léxico de texto plano para archivos CSV sin usar Pandas ni el módulo csv de Python.  
-> Abrimos el archivo físico con `open()`, extraemos los nombres de columnas de la primera línea con `.split(',')` e iteramos sobre los renglones siguientes. Implementamos una función artesanal de inferencia de tipos que convierte dinámicamente cada celda a entero, flotante, booleano, texto o nulo `None`.  
-> Cada registro se representa como una tabla hash (diccionario) y la colección completa se almacena en una lista dinámica dentro de la clase Pocion, integrándose de inmediato con la Tabla de Símbolos."*
-
----
-
-## ESTRUCTURAS DE DATOS UTILIZADAS
-
-| Estructura | Dónde se utiliza | Complejidad | Justificación técnica |
-| :--- | :--- | :--- | :--- |
-| **Lista de Diccionarios** (`List[Dict]`) | Almacenamiento tabular en `Pocion` | Acceso a celda: $\mathcal{O}(1)$<br>Recorrido: $\mathcal{O}(N)$ | Permite consultar campos por nombre (`fila['precio']`) en lugar de índices numéricos, evitando desalineaciones al agregar o quitar columnas |
-| **Tabla Hash** (`Dict[str, Simbolo]`) | Memoria en `TablaSimbolos` | Búsqueda e inserción: $\mathcal{O}(1)$ promedio | Permite verificar al instante si una variable existe y si sus tipos son compatibles |
-| **Árbol n-ario jerárquico** | Árbol de Derivación (AST) de ANTLR | Recorrido: $\mathcal{O}(V)$ lineal en nodos | Modela naturalmente la precedencia de operadores matemáticos y la estructura del programa |
-| **Hash Map de Agrupación** (`Dict[Tuple, List]`) | Agrupación en `Pocion.destilar` | Clasificación: $\mathcal{O}(N)$ lineal | Clasifica $N$ filas en sus categorías usando como clave una tupla de valores en una sola pasada, sin requerir ordenamiento previo ($\mathcal{O}(N \log N)$) |
-| **Pila de Marcos Locales** (`Call Stack` / `List[Dict]`) | Llamadas a recetas en `visitor.py` | Push y Pop: $\mathcal{O}(1)$ | Garantiza el aislamiento de argumentos locales en recetas y permite recursión sin sobreescribir variables globales |
-
----
-
-## DESGLOSE DE ARCHIVOS DEL PROYECTO
-
-### `src/pocion.py`
-Núcleo artesanal de datos. Implementa la clase `Pocion` con todos los métodos de carga, exportación, filtrado, ordenamiento, transmutación, sanación, agrupamiento, generador de números aleatorios por congruencial lineal, muestreo aleatorio de filas y visualización en consola.
-
-### `src/tabla_simbolos.py`
-Libreta de memoria del compilador. Modela cada variable mediante la clase `Simbolo` y gestiona las validaciones de tipo (`POCION`, `NUMERO`, `CADENA`, `BOOLEANO`) y existencia de columnas.
-
-### `src/errores.py`
-Manejador amigable de errores. Define la excepción `ErrorSemantico` y el `ManejadorErrores` que traduce las alertas sintácticas de ANTLR a mensajes claros en español indicando línea y columna.
-
-### `src/motor.py`
-Fachada estática que conecta las operaciones del Visitor con los métodos de la clase `Pocion`.
-
-### `src/visitor.py`
-Intérprete semántico basado en el patrón Visitor de ANTLR. Recorre el árbol sintáctico, ejecuta las transformaciones sobre las pociones, administra la pila de llamadas para recetas, resuelve llamadas nativas a funciones de azar y enlaza compendios.
-
-### `src/main.py`
-Punto de entrada de línea de comandos. Coordina el análisis léxico, el análisis sintáctico, la visualización opcional del árbol con `--arbol` y la ejecución semántica.
-
-### `compendios/matematicas.arc` y `compendios/estadistica.arc`
-Librerías propias escritas 100% en sintaxis Arcanum que proveen recetas reutilizables (`calcular_iva`, `aplicar_descuento`, `potencia`, `azar`, `random`, `calcular_rango`, `porcentaje`).
-
----
-
-## CATÁLOGO DE INSTRUCCIONES Y GRAMÁTICA FORMAL (EBNF)
-
-### Gramática EBNF Simplificada
-```ebnf
-programa            ::= hechizo* EOF ;
-hechizo             ::= asignacion ';'
-                      | instruccionUsar ';'
-                      | instruccionRevelar ';'
-                      | instruccionDescribir ';'
-                      | instruccionPreservar ';'
-                      | instruccionForjar ';'
-                      | definicionReceta ;
-
-asignacion          ::= ID '=' expresion ;
-
-expresion           ::= invocarExpr
-                      | recolectarExpr
-                      | purificarExpr
-                      | ordenarExpr
-                      | transmutarExpr
-                      | sanarExpr
-                      | destilarExpr
-                      | describirExpr
-                      | llamadaReceta
-                      | expresionAritmetica ;
-
-invocarExpr         ::= 'invocar' 'desde' CADENA ;
-recolectarExpr      ::= 'recolectar' '[' listaIds ']' 'de' ID ;
-purificarExpr       ::= 'purificar' ID 'donde' '(' condicion ')' ;
-ordenarExpr         ::= 'ordenar' ID 'por' ID direccionOrden? ;
-transmutarExpr      ::= 'transmutar' ID 'con' ID '=' expresionAritmetica ;
-sanarExpr           ::= 'sanar' ID ('descartar_nulos' | 'llenar' ID 'con' valorLiteral) ;
-destilarExpr        ::= 'destilar' ID 'agrupar' '[' listaIds ']' 'agregando' '[' listaAgregaciones ']' ;
-
-instruccionUsar     ::= 'usar' 'compendio' ID ;
-definicionReceta    ::= 'receta' ID '(' listaIds? ')' '{' hechizo* instruccionDevolver? '}' ;
-instruccionDevolver ::= 'devolver' expresion ';' ;
-```
-
----
-
-## BATERÍA COMPLETA DE PRUEBAS Y EVIDENCIAS
-
-### Resultados del Suite Automatizado (pytest)
-Se ejecutaron 46 pruebas automatizadas cubriendo todas las capas del sistema (control de flujo, estructuras de datos funcionales, matrices artesanales, algoritmos de Machine Learning incluido MLP XOR, lectura multiformato CSV/JSON/Excel, visualización multivariable, semántica e integración) con un resultado de **100% exitoso**:
-
-```
-tests/test_corte3.py ..................                                  [ 39%]
-tests/test_integracion.py .....                                          [ 50%]
-tests/test_semantica.py ..........                                       [ 71%]
-tests/test_unitarias.py ..............                                   [100%]
-
-============================= 46 passed in 1.11s ==============================
-```
-
-### Pruebas Unitarias de Pocion Artesanal (`tests/test_unitarias.py`)
-* `test_recolectar`: Selección de columnas y verificación de inmutabilidad
-* `test_purificar`: Filtrado numérico condicional
-* `test_ordenar`: Ordenamiento ascendente y descendente
-* `test_transmutar`: Generación de nuevas columnas mediante fórmulas
-* `test_sanar_descartar_nulos`: Eliminación de registros con celdas nulas
-* `test_sanar_llenar_nulos`: Imputación de valores por defecto en nulos
-* `test_destilar`: Agrupamiento multivariable con suma y conteo
-* `test_muestra_aleatoria`: Extracción de subconjunto de filas al azar sin reemplazo
-* `test_numero_aleatorio_artesanal`: Generación pseudoaleatoria con congruencial lineal hecho a mano sin librerías
-
-### Pruebas Semánticas Negativas (`tests/test_semantica.py` y `examples/invalido_*.arc`)
-Se verificó que el compilador capture y reporte con claridad las anomalías lógicas:
-
-* **Variable no declarada**:
-  * Archivo: `examples/invalido_semantico_variable.arc`
-  * Entrada: `total = x + variable_inexistente;`
-  * Salida: `[Error Semántico] Línea 3, Columna 8: La variable o ingrediente 'tasa_desconocida' no ha sido declarada o invocada previamente`
-* **Columna inexistente**:
-  * Archivo: `examples/invalido_semantico_columna.arc`
-  * Entrada: `recolectar [columna_falsa] de datos;`
-  * Salida: `[Error Semántico] Línea 4, Columna 22: La poción 'ventas' no contiene el ingrediente (columna) 'columna_inventada' (Disponibles: ['fecha', 'ciudad', 'categoria', 'unidades', 'precio_unitario'])`
-* **Incompatibilidad de tipos**:
-  * Archivo: `examples/invalido_semantico_tipo.arc`
-  * Entrada: `recolectar [ciudad] de 0.19;`
-  * Salida: `[Error Semántico] Línea 4, Columna 23: La variable 'tasa_iva' es de tipo NUMERO, no es una POCIÓN (tabla de datos)`
-
-### Pruebas de Integración con Ejemplos Reales (`examples/`)
-
-#### Análisis de Ventas (`examples/ejemplo1_analisis_ventas.arc`)
-* Carga dataset real con 15 transacciones
-* Limpia registros nulos
-* Filtra ventas con unidades $\ge 2$
-* Calcula columna `subtotal = unidades * precio_unitario`
-* Agrupa por ciudad calculando suma de ingresos y conteo
-* Exporta a `salidas/resumen_ventas_ciudad.csv`
-
-#### Rendimiento Estudiantil (`examples/ejemplo2_rendimiento_estudiantil.arc`)
-* Carga dataset de 12 estudiantes
-* Imputa notas nulas asignando $0.0$
-* Agrupa por carrera calculando promedio de notas
-* Exporta a `salidas/resumen_estudiantes.csv`
-
-#### Calidad del Aire (`examples/ejemplo3_calidad_aire.arc`)
-* Carga mediciones de estaciones ambientales
-* Descarta registros sin datos
-* Filtra mediciones de temperatura $> 18$
-* Agrupa por estación calculando media y desviación estándar de PM2.5
-* Exporta a `salidas/resumen_calidad_aire.csv`
-
-#### Compendios y Recetas Propias (`examples/ejemplo4_compendios_recetas.arc`)
-* Importa la librería `usar compendio matematicas;`
-* Invoca la receta `matematicas.calcular_iva(subtotal, 0.19)`
-* Aplica descuentos calculados y muestra los resultados en la terminal
-
-#### Caso de Estudio Final Integrado (`examples/ejemplo5_caso_estudio_final.arc`)
-* **Flujo completo de Ciencia de Datos**: Carga de CSV $\rightarrow$ Limpieza y sanación $\rightarrow$ Filtrado $\rightarrow$ Transmutación
-* **Control de flujo**: Evaluación con `si / sino` y bucle iterativo `mientras`
-* **Álgebra Lineal**: Creación y transposición de `Matriz` (NumPy artesanal)
-* **Machine Learning Artesanal**:
-  * **Predicción**: Modelo de Regresión Lineal entrenado para estimar ingresos futuros ($R^2 = 1.0$)
-  * **Clasificación**: KNN entrenado para clasificar clientes en Minoristas y Mayoristas
-  * **Agrupamiento**: K-Means clustering generando 3 segmentos en la tabla
-* **Visualización a PNG (Corte 3)**:
-  * `salidas/1_grafica_barras_ciudades.png`: Gráfica de barras de facturación por ciudad
-  * `salidas/2_grafica_lineas_ventas.png`: Serie temporal de ventas
-  * `salidas/3_grafica_dispersion.png`: Dispersión de unidades vs ingreso
-  * `salidas/4_grafica_histograma_precios.png`: Histograma de frecuencias de venta
-* **Preservación**: Exporta tabla consolidada a `salidas/resumen_caso_estudio_final.csv`
-
----
-
-## GUÍA PASO A PASO: CÓMO CORRER CADA PARTE DEL PROYECTO
-
-> Para ver la guía completa e independiente con explicaciones adicionales y atajos, consulta también el archivo [`COMO_CORRER.md`](COMO_CORRER.md).
-
-### 1. Instalación de dependencias del entorno
-
-#### En Windows (PowerShell / CMD):
+### En Windows (PowerShell)
 ```powershell
-# Crear y activar entorno virtual (opcional)
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# Instalar dependencias mínimas
-pip install -r requirements.txt
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
-#### En Linux / Ubuntu:
+### Sin Entorno Virtual (Instalación Global)
 ```bash
-sudo apt update && sudo apt install -y python3 python3-pip python3-venv default-jre
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+pip install antlr4-python3-runtime==4.13.2 pytest matplotlib openpyxl
+python3 src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
 ---
 
-### 2. Ejecución de los 7 grimorios de ejemplo (.arc)
+## Verificación del Compilador
 
-Todos los programas de Arcanum se ejecutan pasando la ruta del archivo `.arc` a `src/main.py`:
+Para auditar la suite completa de pruebas y verificar los 22 ejemplos del lenguaje:
 
 ```bash
-# Ejemplo 1: Flujo de venta de boletos aéreos y destilación por destino
-python3 src/main.py examples/ejemplo1_analisis_ventas.arc
+# 1. Ejecutar las 81 pruebas automáticas
+pytest -q
 
-# Ejemplo 2: Rendimiento académico agrupado por carrera universitaria
-python3 src/main.py examples/ejemplo2_rendimiento_estudiantil.arc
-
-# Ejemplo 3: Monitoreo ambiental de calidad del aire y PM2.5
-python3 src/main.py examples/ejemplo3_calidad_aire.arc
-
-# Ejemplo 4: Sistema de compendios y librerías propias ('usar compendio matematicas;')
-python3 src/main.py examples/ejemplo4_compendios_recetas.arc
-
-# Ejemplo 5: CASO DE ESTUDIO FINAL INTEGRADO (Corte 3: ML, Matrices, CSV/JSON y 4 PNGs)
-python3 src/main.py examples/ejemplo5_caso_estudio_final.arc
-
-# Ejemplo 6: Analítica de vuelos y retrasos con carga nativa en JSON
-python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc
-
-# Ejemplo 7: Los 5 retos de sustentación en tablero del docente
-# (Factorial 5-100, Sigmoide, Red Neuronal MLP XOR, Lectura de Excel Data.xlsx con EDA, Números primos)
-python3 src/main.py examples/ejemplo7_casos_profesor.arc
+# 2. Ejecutar el verificador de los 22 ejemplos
+python3 scripts/verificar_ejemplos.py
 ```
+
+*Resultado*: **81 passed in ~3s** y **22 ejemplos revisados con 0 fallos inesperados**.
 
 ---
 
-### 3. Visualizar el árbol sintáctico (AST) en consola
+## Resumen de Ejemplos Principales
 
-Para inspeccionar la estructura jerárquica del árbol de derivación de ANTLR4, añade el flag `--arbol`:
+| Archivo | Dominio / Propósito | Salidas Producidas |
+|---|---|---|
+| `ejemplo8_control_y_listas.arc` | Introducción a variables, condicionales `si/sino`, bucle `mientras` y listas. | Impresión en consola |
+| `ejemplo9_estructuras_funcionales.arc` | Programación funcional (`mapear`, `filtrar`, `reducir`) y matrices. | Impresión en consola |
+| `ejemplo10_ml_paso_a_paso.arc` | Los 4 algoritmos de Machine Learning ejecutados de forma limpia e individual. | Predicciones de ML |
+| `ejemplo11_tablas_y_recetas.arc` | Creación de tablas directas en código sin archivos y manipulación en recetas. | `salidas/ejemplo11_resumen.csv` |
+| `ejemplo1_analisis_ventas.arc` | Pipeline ETL de ventas aéreas (imputación de nulos, filtros, subtotales y `destilar`). | `salidas/resumen_ventas_ciudad.csv` |
+| `ejemplo5_caso_estudio_final.arc` | Caso integral: EDA, regresión, KNN, K-Means y 4 gráficos PNG. | 4 imágenes `.png` y CSV/JSON |
+| `ejemplo6_analisis_vuelos_json.arc` | Analítica de vuelos leyendo formato nativo **JSON** y gráfica de barras. | `salidas/5_grafica_retraso_aerolineas.png` |
+| `ejemplo7_casos_profesor.arc` | Factorial (5 a 100), Sigmoide real calculada, MLP XOR, EDA de Excel y Primos. | `salidas/6_grafica_sigmoide_tendencia.png`, `8_perdida_xor.png`, CSVs |
 
-```bash
-python3 src/main.py examples/ejemplo1_analisis_ventas.arc --arbol
-python3 src/main.py examples/valido_asignaciones.arc --arbol
-```
-
----
-
-### 4. Ejecución de la suite completa de pruebas automatizadas (46 pruebas)
-
-```bash
-# Correr las 46 pruebas automatizadas (100% éxito)
-python3 -m pytest tests/ -v
-
-# Correr únicamente las pruebas de la Entrega Final (Corte 3)
-python3 -m pytest tests/test_corte3.py -v
-
-# Correr pruebas unitarias del DataFrame artesanal (Pocion)
-python3 -m pytest tests/test_unitarias.py -v
-
-# Correr pruebas semánticas (validaciones lógicas)
-python3 -m pytest tests/test_semantica.py -v
-
-# Correr pruebas de integración de programas completos
-python3 -m pytest tests/test_integracion.py -v
-```
+Para una guía completa paso a paso de cada ejemplo, consulta **[COMO_CORRER.md](COMO_CORRER.md)**.
 
 ---
 
-### 5. Verificación de errores semánticos controlados
+## Documentación y Sustentación
 
-Para demostrarle al profesor cómo el analizador semántico captura anomalías con línea y columna:
-
-```bash
-# Variable no declarada
-python3 src/main.py examples/invalido_semantico_variable.arc
-
-# Columna inexistente en la tabla
-python3 src/main.py examples/invalido_semantico_columna.arc
-
-# Incompatibilidad de tipos de datos
-python3 src/main.py examples/invalido_semantico_tipo.arc
-```
-
----
-
-### 6. Ubicación de los artefactos generados
-
-Al ejecutar los grimorios, los resultados se guardan automáticamente en la carpeta `salidas/`:
-* **Gráficas PNG (300 DPI):** `1_grafica_barras_ciudades.png`, `2_grafica_lineas_ventas.png`, `3_grafica_dispersion.png`, `4_grafica_histograma_precios.png`, `5_grafica_retraso_aerolineas.png`, `6_grafica_sigmoide_tendencia.png`, `7_eda_pasajeros_excel.png`.
-* **Archivos CSV y JSON:** `resumen_caso_estudio_final.csv`, `resumen_caso_estudio_final.json`, `resumen_retrasos_aerolineas.json`, `resumen_ventas_ciudad.csv`.
+En la carpeta `docs/` se encuentra toda la documentación técnica:
+* **[MANUAL_ARCANUM.docx](docs/MANUAL_ARCANUM.docx)**: Manual formal de 24 páginas con teoría, guía de estudio, preguntas frecuentes y guion de 10 minutos para la sustentación.
+* **[REVISION_Y_CAMBIOS.md](docs/REVISION_Y_CAMBIOS.md)**: Informe de revisión de requisitos y refactorización arquitectónica.
+* **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema.
+* **[docs/historico/](docs/historico/)**: Archivo histórico con versiones previas de guías y catálogos.

@@ -25,6 +25,8 @@ fact_5 = factorial(5);
 fact_10 = factorial(10);
 revelar fact_5;
 revelar fact_10;
+fact_100 = factorial(100);
+revelar fact_100;
 
 # -----------------------------------------------------------------------------
 # EJERCICIO 2: Visualizar la función Sigmoide S(x) = 1 / (1 + e^(-x))
@@ -36,14 +38,15 @@ sig_pos4 = sigmoide(4);
 
 revelar sig_cero;
 
-# Cargamos dataset base y forjamos visualización
-# Para graficar, usamos los datos tabulares y generamos la gráfica de la curva
-vuelos_base = invocar desde "datos/vuelos.json";
-forjar artefacto lineas desde vuelos_base con
-    eje_x retraso_min,
-    eje_y precio_boleto,
-    titulo "Visualizacion de Tendencia Continua (Sigmoide)",
-    salida "salidas/6_grafica_sigmoide_tendencia.png";
+# Construimos los puntos reales de la función sigmoide.
+puntos_sigmoide = [];
+para x en rango(-6, 7) {
+    puntos_sigmoide = anexar(puntos_sigmoide, [x, sigmoide(x)]);
+}
+curva_sigmoide = tabla(["x", "probabilidad"], puntos_sigmoide);
+graficar lineas desde curva_sigmoide con eje_x x, eje_y probabilidad,
+    titulo "Funcion sigmoide", salida "salidas/6_grafica_sigmoide_tendencia.png";
+preservar curva_sigmoide en "salidas/sigmoide.csv";
 
 # -----------------------------------------------------------------------------
 # EJERCICIO 3: Analizar el Perceptrón Multicapa para XOR [Gráficas, Estimador]
@@ -69,6 +72,10 @@ revelar pred_0_0;
 revelar pred_0_1;
 revelar pred_1_0;
 revelar pred_1_1;
+perdidas_xor = historial(modelo_xor);
+graficar lineas desde perdidas_xor con eje_x epoca, eje_y perdida,
+    titulo "Aprendizaje de XOR", salida "salidas/8_perdida_xor.png";
+preservar perdidas_xor en "salidas/perdida_xor.csv";
 
 # -----------------------------------------------------------------------------
 # EJERCICIO 4: Data.xlsx -> Realizar un Análisis Exploratorio de datos (EDA)
@@ -115,3 +122,7 @@ revelar es_primo_2;
 revelar es_primo_7;
 revelar es_primo_9;
 revelar es_primo_13;
+
+# Filtro funcional sobre la colección completa.
+primos = filtrar(rango(2, 31), "es_primo");
+revelar primos;

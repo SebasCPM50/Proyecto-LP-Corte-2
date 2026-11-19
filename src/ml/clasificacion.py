@@ -6,6 +6,7 @@ y asignando la clase por votación mayoritaria entre los K vecinos más cercanos
 """
 
 import math
+from ml.validacion import positivo_entero, matriz, vector
 from collections import Counter
 
 
@@ -15,7 +16,7 @@ class KNNClasificador:
     """
 
     def __init__(self, k=3):
-        self.k = int(k)
+        self.k = positivo_entero(k, "k")
         self.datos_x = []
         self.etiquetas_y = []
         self.esta_entrenado = False
@@ -29,11 +30,7 @@ class KNNClasificador:
         if len(datos_x) < self.k:
             raise ValueError(f"Se necesitan al menos {self.k} muestras para K={self.k}")
 
-        self.datos_x = [
-            [float(v) for v in fila] if hasattr(fila, "__iter__") and not isinstance(fila, (str, bytes))
-            else [float(fila)]
-            for fila in datos_x
-        ]
+        self.datos_x = matriz(datos_x)
         self.etiquetas_y = [str(e) for e in etiquetas_y]
         self.esta_entrenado = True
         return self
@@ -52,11 +49,9 @@ class KNNClasificador:
         if not self.esta_entrenado:
             raise RuntimeError("El clasificador KNN no ha sido entrenado")
 
-        vector_p = (
-            [float(v) for v in nuevo_punto]
-            if hasattr(nuevo_punto, "__iter__") and not isinstance(nuevo_punto, (str, bytes))
-            else [float(nuevo_punto)]
-        )
+        vector_p = vector(nuevo_punto)
+        if len(vector_p) != len(self.datos_x[0]):
+            raise ValueError("La predicción debe tener la misma dimensión que el entrenamiento")
 
         # Calculamos distancia a todos los puntos de entrenamiento
         distancias = []

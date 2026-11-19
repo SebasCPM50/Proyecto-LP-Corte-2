@@ -21,6 +21,7 @@ hechizo
     | instruccionUsar
     | definicionReceta
     | instruccionForjar
+    | instruccionDevolver
     ;
 
 // Condicionales clásicos: si (condicion) { ... } sino { ... }
@@ -145,7 +146,7 @@ instruccionPreservar
 //    revelar ventas;
 //    mostrar ventas_limpias;
 instruccionRevelar
-    : ( REVELAR | MOSTRAR ) ID ';'
+    : ( REVELAR | MOSTRAR ) expresion ';'
     ;
 
 // 11. Instrucción para imprimir estadísticas descriptivas en consola:
@@ -163,7 +164,7 @@ instruccionUsar
 // Definición de una receta (función propia del lenguaje):
 // receta calcular_iva(subtotal) { devolver subtotal * 0.19; }
 definicionReceta
-    : RECETA ID '(' listaIds? ')' '{' hechizo* ( instruccionDevolver )? '}'
+    : RECETA ID '(' listaIds? ')' '{' hechizo* '}'
     ;
 
 instruccionDevolver
@@ -205,11 +206,12 @@ parametro
 
 // Condiciones booleanas recursivas con precedencia: NOT > AND > OR
 condicion
-    : condicion Y condicion              # condicionY
+    : NO condicion                       # condicionNo
+    | condicion Y condicion              # condicionY
     | condicion O condicion              # condicionO
-    | NO condicion                       # condicionNo
     | '(' condicion ')'                  # condicionParentesis
     | comparacion                        # condicionComparacion
+    | expresionAritmetica                # condicionValor
     ;
 
 comparacion
@@ -222,10 +224,11 @@ operadorComparacion
 
 // Expresión aritmética con soporte de potencia (^), mult/div/mod (*, /, %), suma/resta (+, -) e indexación ([])
 expresionAritmetica
-    : expresionAritmetica '^' expresionAritmetica                 # potencia
+    : expresionAritmetica '[' expresionAritmetica ']'             # indexacion
+    | <assoc=right> expresionAritmetica '^' expresionAritmetica    # potencia
+    | '-' expresionAritmetica                                    # negativo
     | expresionAritmetica ( '*' | '/' | '%' ) expresionAritmetica # multDivMod
     | expresionAritmetica ( '+' | '-' ) expresionAritmetica       # sumaResta
-    | expresionAritmetica '[' expresionAritmetica ']'             # indexacion
     | '(' expresionAritmetica ')'                                 # parentesis
     | listaLiteral                                                # listaLit
     | llamadaReceta                                               # llamadaFuncion

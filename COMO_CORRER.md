@@ -1,258 +1,186 @@
-# GUÍA DEFINITIVA: CÓMO CORRER CADA PARTE DEL PROYECTO ARCANUM
-**Asignatura:** Lenguajes de Programación y Transducción  
-**Docente:** Joaquín F. Sánchez | **Universidad Sergio Arboleda**  
-**Entrega Final (Corte 3)**
+# Guía de Ejecución y Pruebas de Arcanum
 
-Esta guía contiene todos los comandos exactos y explicaciones paso a paso para ejecutar cada componente del proyecto, tanto en **Windows** como en **Linux (Ubuntu)**.
+Este documento explica de forma detallada cómo instalar dependencias, ejecutar cada uno de los 22 programas de ejemplo y verificar las pruebas unitarias del compilador/intérprete **Arcanum**.
 
 ---
 
-## 1. PREPARACIÓN INICIAL DEL ENTORNO
+## 1. Requisitos e Instalación
 
-Antes de ejecutar cualquier código, asegúrate de tener instaladas las dependencias mínimas del sistema:
+Necesitas **Python 3.10 o superior**. El repositorio ya incluye el lexer y parser generados por ANTLR en `generated/`, por lo que **no necesitas tener Java instalado** para ejecutar Arcanum.
 
-### En Windows (PowerShell o CMD):
+### Opción A: Instalación con Entorno Virtual (Recomendada)
+
+#### En Linux o macOS:
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+#### En Windows (PowerShell):
 ```powershell
-# 1. Ubicarse en la raíz del proyecto
-cd C:\ruta\al\proyecto
-
-# 2. (Opcional recomendado) Crear y activar un entorno virtual
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# 3. Instalar las dependencias del proyecto
-pip install -r requirements.txt
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-### En Linux / Ubuntu:
+### Opción B: Instalación Global Directa (Sin Entorno Virtual)
+
+Si estás trabajando en una máquina virtual de Ubuntu o en tu entorno global:
 ```bash
-# 1. Actualizar paquetes del sistema
-sudo apt update && sudo apt install -y python3 python3-pip python3-venv default-jre
-
-# 2. Crear y activar entorno virtual
-python3 -m venv venv
-source venv/bin/activate
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
+pip3 install antlr4-python3-runtime==4.13.2 pytest matplotlib openpyxl --break-system-packages
 ```
 
-> **Nota sobre librerías:** Arcanum **NO utiliza Pandas ni NumPy** (fueron creados 100% de forma artesanal en `src/pocion.py` y `src/estructuras/matriz.py`). El archivo `requirements.txt` solo instala `antlr4-python3-runtime` (para el analizador léxico/sintáctico), `pytest` (para las pruebas automáticas), `matplotlib` (para exportar los gráficos a imágenes PNG) y `openpyxl` (opcional para lectura directa de archivos Excel `.xlsx`).
+En Windows:
+```powershell
+pip install antlr4-python3-runtime==4.13.2 pytest matplotlib openpyxl
+```
+
+> **IMPORTANTE**: Ejecuta siempre todos los comandos desde la **carpeta raíz del proyecto** (la carpeta donde se encuentran `src/`, `examples/` y `requirements.txt`). Nunca ejecutes comandos desde dentro de `src/`.
 
 ---
 
-## 2. CÓMO CORRER LOS 7 PROGRAMAS DE EJEMPLO (.arc)
+## 2. Verificación Global del Sistema
 
-Todos los programas de Arcanum tienen extensión `.arc` (llamados "Grimorios") y se ejecutan pasando su ruta a `src/main.py`:
+Para verificar que todo el compilador y los módulos de Machine Learning funcionan al 100%:
 
+### A. Correr las 81 pruebas automatizadas (pytest)
 ```bash
-python src/main.py <ruta_al_archivo.arc>
+# Con entorno virtual:
+.venv/bin/python -m pytest -q
+
+# O globalmente:
+pytest -q
 ```
+*Resultado esperado*: `81 passed in ~3s`.
 
----
-
-### Ejemplo 1: Flujo Analítico y Ventas de Boletos Aéreos
-* **Archivo:** `examples/ejemplo1_analisis_ventas.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo1_analisis_ventas.arc
-  ```
-* **Qué hace:**
-  1. Carga el dataset de pasajes aéreos desde `csv/ventas.csv`.
-  2. Muestra los datos crudos en la terminal con `revelar`.
-  3. Imputa los descuentos nulos asignándoles `0.0` con `sanar`.
-  4. Selecciona las columnas necesarias con `recolectar`.
-  5. Filtra ventas válidas (`unidades > 0 y precio > 0`) con `purificar`.
-  6. Calcula el subtotal y total con descuento con `transmutar`.
-  7. Ordena de mayor a menor por facturación con `ordenar`.
-  8. Destila por destino de vuelo calculando suma de ingresos, promedio de ticket y total de transacciones con `destilar`.
-  9. Exporta el reporte tabular a `salidas/resumen_ventas_ciudad.csv`.
-* **Salida esperada:** Tablas formateadas en consola y archivo CSV generado en `salidas/`.
-
----
-
-### Ejemplo 2: Rendimiento Académico Estudiantil
-* **Archivo:** `examples/ejemplo2_rendimiento_estudiantil.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo2_rendimiento_estudiantil.arc
-  ```
-* **Qué hace:**
-  1. Carga `datos/estudiantes.csv` con registros de alumnos universitarios.
-  2. Imputa notas vacías asignándoles `0.0`.
-  3. Agrupa por carrera universitaria y calcula el promedio general de notas.
-  4. Exporta el consolidado a `salidas/resumen_estudiantes.csv`.
-
----
-
-### Ejemplo 3: Monitoreo Ambiental y Calidad del Aire
-* **Archivo:** `examples/ejemplo3_calidad_aire.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo3_calidad_aire.arc
-  ```
-* **Qué hace:**
-  1. Carga mediciones de estaciones meteorológicas desde `datos/calidad_aire.csv`.
-  2. Descarta registros con celdas nulas con `sanar`.
-  3. Filtra estaciones con temperatura $> 18^\circ\text{C}$ con `purificar`.
-  4. Calcula la media aritmética y desviación estándar de material particulado PM2.5 por estación con `destilar`.
-  5. Exporta el resultado a `salidas/resumen_calidad_aire.csv`.
-
----
-
-### Ejemplo 4: Sistema de Compendios y Recetas Propias (Librerías)
-* **Archivo:** `examples/ejemplo4_compendios_recetas.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo4_compendios_recetas.arc
-  ```
-* **Qué hace:**
-  1. Demuestra la modularidad del lenguaje importando una librería propia escrita en Arcanum: `usar compendio matematicas;`.
-  2. Invoca funciones locales y de compendios (`matematicas.calcular_iva`, `matematicas.potencia`).
-  3. Exporta los resultados calculados a `salidas/ventas_con_librerias_propias.csv`.
-
----
-
-### Ejemplo 5: Caso de Estudio Final Integrado (CORTE 3)
-* **Archivo:** `examples/ejemplo5_caso_estudio_final.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo5_caso_estudio_final.arc
-  ```
-* **Qué hace (El flujo completo de Ciencia de Datos):**
-  1. **Carga Multiformato:** Carga simultánea de `datos/vuelos.json` y `csv/ventas.csv`.
-  2. **Control de Flujo:** Evalúa metas con condicionales `si / sino` y ejecuta bucles `mientras`.
-  3. **Álgebra Lineal:** Crea matrices 2D artesanales con `matriz([[1, 2], [3, 4]])` y calcula la `transpuesta`.
-  4. **Machine Learning Artesanal:**
-     * **Predicción:** Entrena una Regresión Lineal por mínimos cuadrados ($R^2=1.0$) y predice ingresos futuros.
-     * **Clasificación:** Entrena un modelo KNN ($K=3$) y clasifica nuevos pasajeros como Frecuente o Corporativo.
-     * **Agrupamiento:** Aplica K-Means clustering generando 3 segmentos en la tabla.
-  5. **Visualización a PNG:** Forja 4 gráficas de alta resolución (300 DPI):
-     * `salidas/1_grafica_barras_ciudades.png`
-     * `salidas/2_grafica_lineas_ventas.png`
-     * `salidas/3_grafica_dispersion.png`
-     * `salidas/4_grafica_histograma_precios.png`
-  6. **Exportación Doble:** Guarda los resultados en `salidas/resumen_caso_estudio_final.csv` y `salidas/resumen_caso_estudio_final.json`.
-
----
-
-### Ejemplo 6: Analítica de Vuelos con Carga Nativa en JSON
-* **Archivo:** `examples/ejemplo6_analisis_vuelos_json.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo6_analisis_vuelos_json.arc
-  ```
-* **Qué hace:**
-  1. Lee directamente el archivo `datos/vuelos.json` a memoria.
-  2. Purifica los vuelos con retraso (`retraso_min > 0`).
-  3. Destila por aerolínea calculando el promedio de retraso y los vuelos afectados.
-  4. Genera la gráfica de barras `salidas/5_grafica_retraso_aerolineas.png`.
-  5. Exporta el reporte final en formato JSON estructurado a `salidas/resumen_retrasos_aerolineas.json`.
-
----
-
-### Ejemplo 7: Los 5 Retos de Sustentación en Tablero
-* **Archivo:** `examples/ejemplo7_casos_profesor.arc`
-* **Comando:**
-  ```bash
-  python src/main.py examples/ejemplo7_casos_profesor.arc
-  ```
-* **Qué hace (Demostración de los 5 ejercicios típicos solicitados por el docente):**
-  1. **Factorial (# 5 al 100):** Calcula $5! = 120$ y $10! = 3628800$ con enteros de precisión arbitraria mediante una receta iterativa con bucle `mientras`.
-  2. **Función Sigmoide $S(x)$:** Calcula $S(0) = 0.5$ y forja la gráfica PNG `salidas/6_grafica_sigmoide_tendencia.png`.
-  3. **Perceptrón Multicapa (MLP) para XOR:** Entrena una red neuronal artificial de 2 capas con Backpropagation artesanal para resolver el problema no lineal de XOR, prediciendo exactamente $[0,0]\to 0$, $[0,1]\to 1$, $[1,0]\to 1$, $[1,1]\to 0$.
-  4. **Data.xlsx y EDA:** Carga directamente la hoja de cálculo Excel `datos/Data.xlsx`, ejecuta `describir` para obtener conteo, media, desviación, min y max, y forja `salidas/7_eda_pasajeros_excel.png`.
-  5. **Filtro de Números Primos:** Evalúa números con la receta pura `es_primo(n)` basada en el operador módulo `%`.
-
----
-
-## 3. CÓMO VISUALIZAR EL ÁRBOL SINTÁCTICO (AST)
-
-Para ver el árbol de derivación sintáctica que construye ANTLR4 paso a paso en formato visual jerárquico, añade el flag `--arbol` al final de cualquier comando:
-
+### B. Correr el verificador de los 22 ejemplos
 ```bash
-# Ver el árbol del Ejemplo 1
-python src/main.py examples/ejemplo1_analisis_ventas.arc --arbol
+# Con entorno virtual:
+.venv/bin/python scripts/verificar_ejemplos.py
 
-# Ver el árbol de asignaciones básicas
-python src/main.py examples/valido_asignaciones.arc --arbol
+# O globalmente:
+python3 scripts/verificar_ejemplos.py
+```
+*Resultado esperado*: `22 ejemplos revisados; 0 fallos inesperados`.
+
+---
+
+## 3. Catálogo de Ejecución de Ejemplos Principales
+
+Para ejecutar cualquier ejemplo, usa la sintaxis:
+```bash
+python3 src/main.py examples/<nombre_del_ejemplo>.arc
+```
+
+### A. Ruta Pedagógica Paso a Paso (Aprender desde cero)
+
+#### Ejemplo 8: Control de Flujo, Variables y Listas
+Muestra variables, condicionales `si/sino`, bucle `mientras`, acumuladores y listas.
+```bash
+python3 src/main.py examples/ejemplo8_control_y_listas.arc
+```
+
+#### Ejemplo 9: Programación Funcional y Matrices
+Muestra operaciones funcionales (`mapear`, `filtrar`, `reducir`) y álgebra lineal con matrices.
+```bash
+python3 src/main.py examples/ejemplo9_estructuras_funcionales.arc
+```
+
+#### Ejemplo 10: Machine Learning Paso a Paso
+Muestra de forma aislada y limpia los 4 modelos de ML: Regresión Lineal, Clasificador KNN, Agrupamiento K-Means y Perceptrón Multicapa (XOR).
+```bash
+python3 src/main.py examples/ejemplo10_ml_paso_a_paso.arc
+```
+
+#### Ejemplo 11: Tablas en Memoria y Recetas
+Crea una Poción desde listas de código sin archivo físico, calcula totales y exporta a `salidas/ejemplo11_resumen.csv`.
+```bash
+python3 src/main.py examples/ejemplo11_tablas_y_recetas.arc
 ```
 
 ---
 
-## 4. CÓMO CORRER LA SUITE COMPLETA DE PRUEBAS (46 PRUEBAS)
+### B. Casos de Estudio y Negocio
 
-El proyecto cuenta con **46 pruebas automatizadas** que verifican el 100% de las capas del compilador y motor:
-
-### Correr todas las pruebas juntas:
+#### Ejemplo 1: Análisis de Ventas de Aerolínea (CSV)
+Carga boletos de vuelos internacionales, sana nulos en descuentos, purifica filas inválidas, calcula subtotales/totales, agrupa por ciudad y exporta a `salidas/resumen_ventas_ciudad.csv`.
 ```bash
-python -m pytest tests/ -v
+python3 src/main.py examples/ejemplo1_analisis_ventas.arc
 ```
 
-### Correr pruebas por módulo específico:
+#### Ejemplo 2: Rendimiento Estudiantil (CSV)
+Filtra por asistencia mínima (>= 75%), promedia parciales y agrupa por carrera. Exporta a `salidas/resumen_estudiantes.csv`.
 ```bash
-# 1. Pruebas de la Entrega Final (Control de flujo, NumPy, ML, Gráficos, JSON, Excel)
-python -m pytest tests/test_corte3.py -v
+python3 src/main.py examples/ejemplo2_rendimiento_estudiantil.arc
+```
 
-# 2. Pruebas Unitarias del DataFrame artesanal (Pocion) y Tabla de Símbolos
-python -m pytest tests/test_unitarias.py -v
+#### Ejemplo 3: Monitoreo de Calidad del Aire (CSV)
+Imputa partículas PM10 faltantes con valor 50, filtra lecturas positivas y agrupa por estación de monitoreo. Exporta a `salidas/resumen_calidad_aire.csv`.
+```bash
+python3 src/main.py examples/ejemplo3_calidad_aire.arc
+```
 
-# 3. Pruebas Semánticas (Validación de errores lógicos controlados)
-python -m pytest tests/test_semantica.py -v
+#### Ejemplo 4: Compendios y Librerías Externas (.arc)
+Demuestra el uso de la cláusula `usar compendio matematicas;` y `usar compendio estadistica;`.
+```bash
+python3 src/main.py examples/ejemplo4_compendios_recetas.arc
+```
 
-# 4. Pruebas de Integración (Ejecución completa de grimorios y validación de salidas)
-python -m pytest tests/test_integracion.py -v
+#### Ejemplo 5: Caso de Estudio Integral (ML, Matrices y 4 Gráficas PNG)
+Pipeline completo que entrena Regresión, KNN, K-Means, y genera 4 gráficos visuales en `salidas/`.
+```bash
+python3 src/main.py examples/ejemplo5_caso_estudio_final.arc
+```
+
+#### Ejemplo 6: Analítica de Vuelos Comerciales y Retrasos (JSON)
+Demuestra la lectura nativa de archivos **JSON** (`datos/vuelos.json`), agrupa retrasos por aerolínea, genera la gráfica de barras `salidas/5_grafica_retraso_aerolineas.png` y exporta el resultado a JSON.
+```bash
+python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc
+```
+
+#### Ejemplo 7: Los 5 Problemas del Profesor
+Ejecuta los 5 ejercicios del tablero:
+1. Función factorial ($5!$, $10!$ y $100!$).
+2. Función Sigmoide matemática real calculando 13 puntos y graficando `salidas/6_grafica_sigmoide_tendencia.png`.
+3. Perceptrón Multicapa resolviendo el problema no lineal XOR con curva de pérdida `salidas/8_perdida_xor.png`.
+4. Análisis exploratorio de datos de Excel (`datos/Data.xlsx`) con gráfica `salidas/7_eda_pasajeros_excel.png`.
+5. Filtro funcional de números primos del 2 al 30.
+```bash
+python3 src/main.py examples/ejemplo7_casos_profesor.arc
 ```
 
 ---
 
-## 5. CÓMO PROBAR LOS ERRORES SEMÁNTICOS CONTROLADOS
+## 4. Ejemplos de Validación de Errores (7 Casos Inválidos)
 
-Para demostrarle al profesor cómo el analizador semántico captura y reporta anomalías lógicas con número exacto de línea y columna, ejecuta los siguientes programas con errores intencionales:
+El compilador incluye validaciones para atrapar errores y detener la ejecución de forma segura con código de salida 1:
 
+| Archivo | Tipo de Error Demostrado |
+|---|---|
+| `examples/invalido_lexico.arc` | Cadena de texto sin cerrar comillas |
+| `examples/invalido_lexico_caracter.arc` | Carácter ilegal no reconocido (`~`) |
+| `examples/invalido_sintactico.arc` | Expresión incompleta y sintaxis mal formada |
+| `examples/invalido_sintactico_recolectar.arc` | Omisión de palabra reservada obligatoria (`de`) |
+| `examples/invalido_semantico_variable.arc` | Uso de variable no declarada |
+| `examples/invalido_semantico_columna.arc` | Consulta de columna inexistente en la tabla |
+| `examples/invalido_semantico_tipo.arc` | Operación incompatible de tipos (seleccionar columnas de un número) |
+
+Para probar cualquiera:
 ```bash
-# 1. Error de Variable no declarada
-python src/main.py examples/invalido_semantico_variable.arc
-# Salida: [Error Semántico] Línea 3, Columna 8: La variable o ingrediente 'tasa_desconocida' no ha sido declarada
-
-# 2. Error de Columna que no existe en la tabla
-python src/main.py examples/invalido_semantico_columna.arc
-# Salida: [Error Semántico] Línea 4, Columna 22: La poción 'ventas' no contiene el ingrediente 'columna_inventada'
-
-# 3. Error de Tipo incompatible (tratar un número como tabla)
-python src/main.py examples/invalido_semantico_tipo.arc
-# Salida: [Error Semántico] Línea 4, Columna 23: La variable 'tasa_iva' es de tipo NUMERO, no es una POCIÓN
+python3 src/main.py examples/invalido_semantico_columna.arc
 ```
 
 ---
 
-## 6. DÓNDE SE ENCUENTRAN LAS SALIDAS GENERADAS
+## 5. Parámetros Avanzados de la Terminal
 
-Cada vez que ejecutas los grimorios, los archivos resultantes se guardan de forma automática y ordenada en la carpeta `salidas/`:
-
-### Gráficas PNG generadas a 300 DPI:
-* `salidas/1_grafica_barras_ciudades.png`: Ingresos totales por destino de vuelo (Barras).
-* `salidas/2_grafica_lineas_ventas.png`: Evolución temporal de facturación (Líneas).
-* `salidas/3_grafica_dispersion.png`: Relación pasajeros vs precio del boleto (Dispersión).
-* `salidas/4_grafica_histograma_precios.png`: Distribución de tarifas de pasajes (Histograma).
-* `salidas/5_grafica_retraso_aerolineas.png`: Retraso promedio por aerolínea en minutos (Barras).
-* `salidas/6_grafica_sigmoide_tendencia.png`: Curva continua de función sigmoide (Líneas).
-* `salidas/7_eda_pasajeros_excel.png`: Análisis exploratorio de pasajeros desde Excel (Barras).
-
-### Reportes tabulares exportados:
-* `salidas/resumen_caso_estudio_final.csv`: Consolidado exportado en formato CSV.
-* `salidas/resumen_caso_estudio_final.json`: Consolidado exportado en formato JSON estructurado.
-* `salidas/resumen_retrasos_aerolineas.json`: Reporte de puntualidad en JSON.
-* `salidas/resumen_ventas_ciudad.csv`: Resumen de ventas por destino en CSV.
-
----
-
-## 7. CÓMO REGENERAR LA GRAMÁTICA ANTLR4 (SI FUERA NECESARIO)
-
-Si el profesor te pide recompilar la gramática formal `grammar/Arcanum.g4` para regenerar el Parser y Lexer en Python:
-
+### Inspeccionar el Árbol de Análisis Sintáctico (CST/AST de ANTLR)
+Usa `--arbol` para imprimir en consola cómo ANTLR analizó la estructura jerárquica del código:
 ```bash
-# Comando estándar con el JAR de ANTLR4:
-java -jar /ruta/a/antlr-4.13.2-complete.jar -Dlanguage=Python3 -visitor -no-listener -o generated grammar/Arcanum.g4
+python3 src/main.py examples/valido_asignaciones.arc --arbol
 ```
-*(Los archivos autogenerados se encuentran organizados dentro de la carpeta `generated/`).*
+
+### Modificar el Límite de Seguridad de Iteraciones
+Por defecto, el bucle `mientras` se detiene a las 10,000 iteraciones para prevenir ciclos infinitos. Puedes ajustar este umbral:
+```bash
+python3 src/main.py examples/ejemplo8_control_y_listas.arc --max-iteraciones 20000
+```

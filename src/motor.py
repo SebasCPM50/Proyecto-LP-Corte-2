@@ -139,7 +139,9 @@ class MotorDatos:
     def entrenar_mlp(datos_x, etiquetas_y, n_oculta=2, epocas=3500, tasa=1.0):
         """Entrena un Perceptrón Multicapa (MLP) para problemas no lineales como XOR."""
         from ml.perceptron import PerceptronMulticapa
-        n_ent = len(datos_x[0]) if hasattr(datos_x, '__getitem__') and len(datos_x) > 0 else 2
+        from ml.validacion import matriz
+        datos_x = matriz(datos_x)
+        n_ent = len(datos_x[0])
         modelo = PerceptronMulticapa(n_entrada=n_ent, n_oculta=n_oculta, n_salida=1, tasa_aprendizaje=tasa, epocas=epocas)
         return modelo.entrenar(datos_x, etiquetas_y)
 
