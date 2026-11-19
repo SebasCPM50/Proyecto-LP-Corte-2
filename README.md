@@ -23,7 +23,7 @@ Proyecto-LP-Final/
 │   └── main.py                 # Punto de entrada CLI con soporte de flags
 ├── grammar/                    # Gramática formal del lenguaje (Arcanum.g4)
 ├── generated/                  # Lexer, Parser y Visitor generados por ANTLR 4.13.2
-├── examples/                   # 22 programas .arc (15 válidos y 7 de prueba de errores)
+├── examples/                   # 9 programas .arc oficiales listos para ejecutar
 ├── datos/                      # Datasets de entrada (CSV, JSON, Excel .xlsx)
 ├── csv/                        # Datasets alternativos compatibles
 ├── compendios/                 # Módulos y librerías reutilizables en Arcanum
@@ -66,32 +66,33 @@ python3 src/main.py examples/ejemplo8_control_y_listas.arc
 
 ## Verificación del Compilador
 
-Para auditar la suite completa de pruebas y verificar los 22 ejemplos del lenguaje:
+Para auditar la suite completa de pruebas y verificar los 9 ejemplos del lenguaje:
 
 ```bash
 # 1. Ejecutar las 81 pruebas automáticas
 pytest -q
 
-# 2. Ejecutar el verificador de los 22 ejemplos
+# 2. Ejecutar el verificador de los 9 ejemplos oficiales
 python3 scripts/verificar_ejemplos.py
 ```
 
-*Resultado*: **81 passed in ~3s** y **22 ejemplos revisados con 0 fallos inesperados**.
+*Resultado*: **81 passed in ~2s** y **9 ejemplos revisados con 0 fallos inesperados**.
 
 ---
 
-## Resumen de Ejemplos Principales
+## Catálogo de los 9 Ejemplos Oficiales
 
-| Archivo | Dominio / Propósito | Salidas Producidas |
-|---|---|---|
-| `ejemplo8_control_y_listas.arc` | Introducción a variables, condicionales `si/sino`, bucle `mientras` y listas. | Impresión en consola |
-| `ejemplo9_estructuras_funcionales.arc` | Programación funcional (`mapear`, `filtrar`, `reducir`) y matrices. | Impresión en consola |
-| `ejemplo10_ml_paso_a_paso.arc` | Los 4 algoritmos de Machine Learning ejecutados de forma limpia e individual. | Predicciones de ML |
-| `ejemplo11_tablas_y_recetas.arc` | Creación de tablas directas en código sin archivos y manipulación en recetas. | `salidas/ejemplo11_resumen.csv` |
-| `ejemplo1_analisis_ventas.arc` | Pipeline ETL de ventas aéreas (imputación de nulos, filtros, subtotales y `destilar`). | `salidas/resumen_ventas_ciudad.csv` |
-| `ejemplo5_caso_estudio_final.arc` | Caso integral: EDA, regresión, KNN, K-Means y 4 gráficos PNG. | 4 imágenes `.png` y CSV/JSON |
-| `ejemplo6_analisis_vuelos_json.arc` | Analítica de vuelos leyendo formato nativo **JSON** y gráfica de barras. | `salidas/5_grafica_retraso_aerolineas.png` |
-| `ejemplo7_casos_profesor.arc` | Factorial (5 a 100), Sigmoide real calculada, MLP XOR, EDA de Excel y Primos. | `salidas/6_grafica_sigmoide_tendencia.png`, `8_perdida_xor.png`, CSVs |
+| Número | Archivo | Dominio / Propósito | Salidas Producidas |
+|:---:|---|---|---|
+| **1** | `ejemplo1_analisis_ventas.arc` | **Pipeline ETL en CSV**: Limpieza de nulos, filtros, subtotales y agrupación por destino de vuelos. | `salidas/resumen_ventas_ciudad.csv` |
+| **2** | `ejemplo2_rendimiento_estudiantil.arc` | **Filtros Académicos**: Asistencia mínima $\ge 75\%$, promedios y carreras universitarias. | `salidas/resumen_estudiantes.csv` |
+| **3** | `ejemplo3_calidad_aire.arc` | **Imputación Ambiental**: Relleno de partículas PM10, filtros y agrupación por estación. | `salidas/resumen_calidad_aire.csv` |
+| **4** | `ejemplo4_compendios_recetas.arc` | **Compendios y Librerías**: Modularización con `usar compendio matematicas;` y `estadistica;`. | `salidas/ventas_con_librerias_propias.csv` |
+| **5** | `ejemplo5_caso_estudio_final.arc` | **Machine Learning Integral**: Regresión Lineal, KNN, K-Means, matrices y 4 gráficos PNG. | 4 imágenes `.png` y CSV/JSON |
+| **6** | `ejemplo6_analisis_vuelos_json.arc` | **Analítica Multiformato JSON**: Lectura nativa de `vuelos.json` y gráfica de barras PNG. | `salidas/5_grafica_retraso_aerolineas.png` y JSON |
+| **7** | `ejemplo7_casos_profesor.arc` | **Los 5 Ejercicios del Profesor**: Factorial (5 a 100), Sigmoide real, MLP XOR, Excel y Primos. | Gráficas `6` y `8`, CSV de pérdida y sigmoide |
+| **8** | `ejemplo8_control_y_listas.arc` | **Fundamentos Básicos**: Variables, condicionales `si/sino`, bucle `mientras` y listas. | Impresión en consola |
+| **9** | `ejemplo9_estructuras_funcionales.arc` | **Programación Funcional y Matrices**: `mapear`, `filtrar`, `reducir` y álgebra lineal de matrices. | Impresión en consola |
 
 Para una guía completa paso a paso de cada ejemplo, consulta **[COMO_CORRER.md](COMO_CORRER.md)**.
 
@@ -100,7 +101,7 @@ Para una guía completa paso a paso de cada ejemplo, consulta **[COMO_CORRER.md]
 ## Documentación y Sustentación
 
 En la carpeta `docs/` se encuentra toda la documentación técnica:
-* **[MANUAL_ARCANUM.docx](docs/MANUAL_ARCANUM.docx)**: Manual formal de 24 páginas con teoría, guía de estudio, preguntas frecuentes y guion de 10 minutos para la sustentación.
+* **[MANUAL_ARCANUM.docx](docs/MANUAL_ARCANUM.docx)**: Manual formal con teoría, guía de estudio, preguntas frecuentes y guion de 10 minutos para la sustentación.
 * **[REVISION_Y_CAMBIOS.md](docs/REVISION_Y_CAMBIOS.md)**: Informe de revisión de requisitos y refactorización arquitectónica.
 * **[VERIFICACION.txt](docs/VERIFICACION.txt)**: Registro de auditoría y pruebas del sistema.
-* **[docs/historico/](docs/historico/)**: Archivo histórico con versiones previas de guías y catálogos.
+* **[docs/historico/](docs/historico/)**: Archivo histórico con versiones y ejemplos anteriores.

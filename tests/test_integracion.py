@@ -18,14 +18,14 @@ from pocion import Pocion
 class TestIntegracionProgramas:
     """Acá probamos que los ejemplos reales de Arcanum corran completos sin fallar"""
 
-    def test_ejecutar_valido_asignaciones(self):
-        # Corre el ejemplo de variables básicas
-        ruta = os.path.join("examples", "valido_asignaciones.arc")
+    def test_ejecutar_ejemplo8_control_y_listas(self):
+        # Corre el ejemplo de control de flujo y listas
+        ruta = os.path.join("examples", "ejemplo8_control_y_listas.arc")
         assert ejecutar(ruta) is True
 
-    def test_ejecutar_valido_completo(self):
-        # Corre el ejemplo con todas las operaciones
-        ruta = os.path.join("examples", "valido_completo.arc")
+    def test_ejecutar_ejemplo9_estructuras_funcionales(self):
+        # Corre el ejemplo de programación funcional y matrices
+        ruta = os.path.join("examples", "ejemplo9_estructuras_funcionales.arc")
         assert ejecutar(ruta) is True
 
     def test_ejecutar_programa1_ventas_y_verificar_csv(self):
