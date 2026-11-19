@@ -1,9 +1,7 @@
 """Registro extensible de funciones del lenguaje, separado del recorrido ANTLR."""
-import math
 from errores import ErrorSemantico
 from estructuras.arreglo import Arreglo
 from estructuras.matriz import Matriz
-from motor import MotorDatos
 from pocion import Pocion, numero_aleatorio
 
 
@@ -89,16 +87,6 @@ def crear_registro():
     simple("tabla", 2, 2, tabla)
     simple("columna", 2, 2, columna)
     simple("a_matriz", 2, 2, Matriz.desde_pocion)
-    simple("regresion regresion_lineal", 2, 2, MotorDatos.entrenar_regresion)
-    simple("knn clasificador_knn", 2, 3, MotorDatos.entrenar_knn)
-    simple("kmeans agrupar_kmeans", 2, 3, MotorDatos.agrupar_kmeans)
-    simple("mlp perceptron", 2, 5, MotorDatos.entrenar_mlp)
-    simple("predecir", 2, 2, lambda m, x: m.predecir(x))
-    simple("predecir_lote", 2, 2, lambda m, xs: Arreglo([m.predecir(x) for x in xs]))
-    simple("probabilidad", 2, 2, lambda m, x: m.predecir_probabilidad(x))
-    simple("historial", 1, 1, lambda m: m.a_pocion_perdida())
-    simple("resumen_modelo", 1, 1, lambda m: m.resumen())
-    simple("sigmoide sigmoid", 1, 1, lambda x: round(1.0 / (1.0 + math.exp(-max(min(float(x), 15.0), -15.0))), 6))
     r.registrar("mapear", 2, 2, lambda i, a, f: funcional(i, "mapear", a, f))
     r.registrar("filtrar", 2, 2, lambda i, a, f: funcional(i, "filtrar", a, f))
     r.registrar("reducir", 3, 3, lambda i, a, f, inicial: funcional(i, "reducir", a, f, inicial))

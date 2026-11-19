@@ -69,8 +69,6 @@ class TablaSimbolos:
             return "NUMERO"
         elif isinstance(valor, str):
             return "CADENA"
-        elif hasattr(valor, "predecir") or hasattr(valor, "agrupar"):
-            return "MODELO_ML"
         return "DESCONOCIDO"
 
     def existe(self, nombre):
@@ -142,8 +140,6 @@ class TablaSimbolos:
                 print(f"  * {nombre} -> MATRIZ [{m.filas} filas x {m.columnas} columnas]")
             elif simb.tipo == "LISTA":
                 print(f"  * {nombre} -> LISTA [{len(simb.valor)} elementos]: {simb.valor}")
-            elif simb.tipo == "MODELO_ML":
-                print(f"  * {nombre} -> MODELO_ML: {simb.valor}")
             else:
                 print(f"  * {nombre} -> {simb.tipo} = {simb.valor}")
         print()

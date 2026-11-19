@@ -251,7 +251,7 @@ class ArcanumVisitorEjecutor(ControlFlujo, Expresiones, Recetas, Ambitos, Arcanu
         return None
 
     def visitInstruccionRevelar(self, ctx: ArcanumParser.InstruccionRevelarContext):
-        # Muestra en la terminal el contenido de una variable (Poción, escalar, lista, modelo)
+        # Muestra en la terminal el contenido de una variable (Poción, escalar, lista)
         nombre_var = ctx.expresion().getText()
         linea = ctx.start.line
         columna = ctx.start.column

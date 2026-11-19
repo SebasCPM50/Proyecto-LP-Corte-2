@@ -9,8 +9,6 @@ from analizador import analizar_texto
 from visitor import ArcanumVisitorEjecutor
 from errores import ErrorSemantico
 from pocion import Pocion
-from ml.clustering import KMediasClustering
-from ml.perceptron import PerceptronMulticapa
 
 
 def ejecutar(codigo, limite=10000):
@@ -72,15 +70,7 @@ def test_funcional_y_matrices():
 @pytest.mark.parametrize('codigo', [
     'x = [1, 2][0.5];', 'x = matriz([[1], [2,3]]);',
     'x = rango(1, 5, 0);', 'x = rango(1.5);', 'x = longitud();',
-    'x = knn([[1],[2]], ["a","b"], 0);',
-    'x = knn([[1],[2,3]], ["a","b"], 1);',
-    'm = knn([[1,2]], ["a"], 1); x = predecir(m, [1]);',
-    'x = mlp([], []);', 'x = mlp([[1]], [2]);',
-    'x = regresion([1,2], [1]);', 'x = regresion([1, "texto"], [1,2]);',
-    't = tabla(["x"], [[1],[2]]); x = kmeans(t, ["ausente"], 1);',
-    't = tabla(["x"], [[1],[2]]); x = kmeans(t, ["x"], 0);',
-    'devolver 1;', 'x = tabla(["x"], [[1,2]]);',
-    'x = azar(10, 1);', 'x = predecir(1, 5);'])
+    'devolver 1;', 'x = tabla(["x"], [[1,2]]);', 'x = azar(10, 1);'])
 def test_errores_claros(codigo):
     with pytest.raises(ErrorSemantico):
         ejecutar(codigo)
@@ -107,14 +97,6 @@ def test_conteo_columna_y_nulos_ordenados():
     assert p.destilar(['g'], [{'funcion':'contar','columna':'v','alias':'n'}]).filas[0]['n'] == 2
 
 
-def test_kmeans_un_grupo_y_mlp_sin_entrenar():
-    modelo = KMediasClustering(k=1)
-    assert modelo.agrupar([[1],[3],[5]]) == [0,0,0]
-    assert modelo.centroides == [[3]]
-    with pytest.raises(RuntimeError, match='entrenado'):
-        PerceptronMulticapa().predecir([0,0])
-
-
 def test_compendio_invalido_no_se_ejecuta(tmp_path, monkeypatch):
     (tmp_path / 'compendios').mkdir()
     (tmp_path / 'compendios/roto.arc').write_text('receta f( { devolver 2; }')
@@ -123,11 +105,9 @@ def test_compendio_invalido_no_se_ejecuta(tmp_path, monkeypatch):
         ejecutar('usar compendio roto;')
 
 
-def test_sigmoide_y_xor_del_ejemplo7():
+def test_ejercicios_basicos_del_ejemplo7():
     t = ejecutar((RAIZ / 'examples/ejemplo7_casos_profesor.arc').read_text())
-    filas = t.obtener_pocion('curva_sigmoide').filas
-    assert filas[6] == {'x': 0, 'probabilidad': 0.5}
-    assert all(a['probabilidad'] < b['probabilidad'] for a,b in zip(filas, filas[1:]))
+    assert t.obtener_valor('fact_5') == 120
+    assert t.obtener_valor('fact_10') == 3628800
     assert list(t.obtener_valor('primos')) == [2,3,5,7,11,13,17,19,23,29]
-    assert [t.obtener_valor(n) for n in ('pred_0_0','pred_0_1','pred_1_0','pred_1_1')] == [0,1,1,0]
-    assert t.obtener_pocion('perdidas_xor').filas[-1]['epoca'] == 3500
+    assert len(t.obtener_pocion('datos_excel')) == 5

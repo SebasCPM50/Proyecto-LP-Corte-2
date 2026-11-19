@@ -2,6 +2,6 @@
 antlr4-python3-runtime==4.13.2
 pytest>=7,<10
 # Solo se usan para gráficos y lectura Excel, respectivamente.
-# Matplotlib instala NumPy como dependencia indirecta; el motor y ML no lo importan.
+# Matplotlib instala NumPy como dependencia indirecta; el motor tabular no lo importa.
 matplotlib>=3.7,<4
 openpyxl>=3.1,<4

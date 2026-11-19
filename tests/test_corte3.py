@@ -2,8 +2,7 @@
 Pruebas para los Requisitos de Corte 3 y Entrega Final de Arcanum:
 1. Control de flujo: Condicionales (si / sino) y Bucles (mientras, para)
 2. Estructuras de datos: Arreglo funcional y Matriz (NumPy artesanal)
-3. Machine Learning artesanal: Regresión Lineal, KNN y K-Means
-4. Visualización desacoplada: Forja de gráficas a PNG
+3. Visualización desacoplada: Forja de gráficas a PNG
 """
 
 import os
@@ -20,9 +19,6 @@ from tabla_simbolos import TablaSimbolos
 from visitor import ArcanumVisitorEjecutor
 from estructuras.arreglo import Arreglo
 from estructuras.matriz import Matriz
-from ml.regresion import RegresionLineal
-from ml.clasificacion import KNNClasificador
-from ml.clustering import KMediasClustering
 from motor import MotorDatos
 
 
@@ -132,61 +128,12 @@ class TestEstructurasNumPyArtesanales:
         assert suma == 15
 
 
-class TestMachineLearningArtesanal:
-    """Pruebas de Regresión Lineal, KNN y K-Means."""
-
-    def test_regresion_lineal_prediccion(self):
-        # y = 2*x + 10
-        x = [1, 2, 3, 4, 5]
-        y = [12, 14, 16, 18, 20]
-        reg = RegresionLineal().entrenar(x, y)
-        assert abs(reg.pendiente_m - 2.0) < 0.001
-        assert abs(reg.intercepto_b - 10.0) < 0.001
-        assert abs(reg.r2 - 1.0) < 0.001
-        assert abs(reg.predecir(10) - 30.0) < 0.001
-
-    def test_knn_clasificacion(self):
-        # Puntos cerca del origen son 'Bajo', puntos lejos son 'Alto'
-        datos = [[1.0, 1.0], [1.5, 1.2], [8.0, 9.0], [9.0, 8.5]]
-        etiquetas = ["Bajo", "Bajo", "Alto", "Alto"]
-        knn = KNNClasificador(k=3).entrenar(datos, etiquetas)
-        assert knn.predecir([1.2, 1.1]) == "Bajo"
-        assert knn.predecir([8.5, 8.8]) == "Alto"
-
-    def test_kmeans_clustering(self):
-        # Dos grupos claramente separados
-        datos = [[1.0, 1.0], [1.2, 0.9], [10.0, 10.0], [10.5, 9.8]]
-        km = KMediasClustering(k=2, max_iter=10)
-        clusters = km.agrupar(datos)
-        assert len(clusters) == 4
-        # Los dos primeros deben estar en el mismo cluster y los dos últimos en otro
-        assert clusters[0] == clusters[1]
-        assert clusters[2] == clusters[3]
-        assert clusters[0] != clusters[2]
 
 
 class TestIntegracionDSLCompleto:
-    """Pruebas de funciones ML y visualización forjar directamente desde Arcanum."""
+    """Pruebas de lectura de datos y visualización forjar directamente desde Arcanum."""
 
-    def test_dsl_regresion_y_predecir(self):
-        codigo = """
-        x_datos = [1, 2, 3, 4];
-        y_datos = [2, 4, 6, 8];
-        modelo = regresion(x_datos, y_datos);
-        prediccion_5 = predecir(modelo, 5);
-        """
-        tabla = ejecutar_codigo(codigo)
-        assert abs(tabla.obtener_valor("prediccion_5") - 10.0) < 0.01
 
-    def test_dsl_knn_clasificador(self):
-        codigo = """
-        datos = [[1, 1], [2, 1], [8, 8], [9, 9]];
-        clases = ["Pequeño", "Pequeño", "Grande", "Grande"];
-        modelo_knn = knn(datos, clases, 3);
-        resultado = predecir(modelo_knn, [1.5, 1.2]);
-        """
-        tabla = ejecutar_codigo(codigo)
-        assert tabla.obtener_valor("resultado") == "Pequeño"
 
     def test_dsl_forjar_grafica_png(self, tmp_path):
         ruta_png = os.path.join(str(tmp_path), "test_grafica.png")
@@ -231,18 +178,3 @@ class TestIntegracionDSLCompleto:
         assert len(pocion) == 5
         assert "total_pasajeros" in pocion.columnas
 
-    def test_dsl_mlp_xor(self):
-        codigo = """
-        X = [[0, 0], [0, 1], [1, 0], [1, 1]];
-        y_xor = [0, 1, 1, 0];
-        modelo = mlp(X, y_xor);
-        p00 = predecir(modelo, [0, 0]);
-        p01 = predecir(modelo, [0, 1]);
-        p10 = predecir(modelo, [1, 0]);
-        p11 = predecir(modelo, [1, 1]);
-        """
-        tabla = ejecutar_codigo(codigo)
-        assert tabla.obtener_valor("p00") == 0
-        assert tabla.obtener_valor("p01") == 1
-        assert tabla.obtener_valor("p10") == 1
-        assert tabla.obtener_valor("p11") == 0

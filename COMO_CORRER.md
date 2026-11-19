@@ -1,100 +1,131 @@
-# Guía de Ejecución y Pruebas de Arcanum
+# Guía Completa de Ejecución y Estudio de Arcanum
 
-Este documento explica de forma detallada cómo instalar dependencias, ejecutar cada uno de los **9 programas de ejemplo** y verificar las pruebas unitarias del compilador/intérprete **Arcanum**.
+Esta guía explica paso a paso cómo instalar dependencias, ejecutar los ejemplos clave del lenguaje y correr la batería de pruebas automatizadas del proyecto **Arcanum**.
 
 ---
 
-## 1. Requisitos e Instalación
+## 1. Instalación y Primeros Pasos
 
-Necesitas **Python 3.10 o superior**. El repositorio ya incluye el lexer y parser generados por ANTLR en `generated/`, por lo que **no necesitas tener Java instalado** para ejecutar Arcanum.
+Necesitas **Python 3.10 o posterior**. El repositorio ya incluye el lexer y parser generados por ANTLR en `generated/`, por lo que **no requieres tener Java instalado**.
 
-### Opción A: Instalación con Entorno Virtual (Recomendada)
+### Opción A: Con Entorno Virtual (Recomendada)
 
 #### En Linux o macOS:
 ```bash
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
 #### En Windows (PowerShell):
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
-### Opción B: Instalación Global Directa (Sin Entorno Virtual)
+### Opción B: Sin Entorno Virtual (Instalación Global)
 
-Si estás trabajando en una máquina virtual de Ubuntu o en tu entorno global:
+#### En Ubuntu / Debian:
 ```bash
 pip3 install antlr4-python3-runtime==4.13.2 pytest matplotlib openpyxl --break-system-packages
+python3 src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
-En Windows:
+#### En Windows:
 ```powershell
 pip install antlr4-python3-runtime==4.13.2 pytest matplotlib openpyxl
+python src/main.py examples/ejemplo8_control_y_listas.arc
 ```
 
-> **IMPORTANTE**: Ejecuta siempre todos los comandos desde la **carpeta raíz del proyecto** (la carpeta donde se encuentran `src/`, `examples/` y `requirements.txt`). Nunca ejecutes comandos desde dentro de `src/`.
+> **Regla de Oro**: Ejecuta siempre desde la **carpeta raíz del proyecto** (donde están `src/`, `examples/` y `requirements.txt`). Nunca ejecutes comandos desde dentro de `src/`.
 
 ---
 
-## 2. Verificación Global del Sistema
+## 2. Verificación Automatizada del Compilador
 
-Para verificar que todo el compilador y los módulos de Machine Learning funcionan al 100%:
+Para auditar que todo el analizador sintáctico, el motor tabular y los módulos funcionen a la perfección:
 
-### A. Correr las 81 pruebas automatizadas (pytest)
+### A. Correr las 64 Pruebas Unitarias e Integración (pytest)
 ```bash
-# Con entorno virtual:
-.venv/bin/python -m pytest -q
-
-# O globalmente:
 pytest -q
 ```
-*Resultado esperado*: `81 passed in ~2s`.
+*Salida esperada*: `64 passed in ~1s`.
 
-### B. Correr el verificador de los 9 ejemplos
+### B. Correr el Verificador de los 21 Ejemplos
 ```bash
-# Con entorno virtual:
-.venv/bin/python scripts/verificar_ejemplos.py
-
-# O globalmente:
 python3 scripts/verificar_ejemplos.py
 ```
-*Resultado esperado*: `9 ejemplos revisados; 0 fallos inesperados`.
+*Salida esperada*: `21 ejemplos revisados; 0 fallos inesperados`.
 
 ---
 
-## 3. Catálogo de los 9 Ejemplos Oficiales
+## 3. Ruta Sugerida de Estudio para la Sustentación (Los 4 Claves)
 
-Para ejecutar cualquier ejemplo, usa la sintaxis:
-```bash
-python3 src/main.py examples/<nombre_del_ejemplo>.arc
-```
+Para no saturarse con demasiados códigos, la **Guía Breve de Arcanum** recomienda enfocarse en estos 4 programas en orden:
 
-| Número | Archivo | Qué demuestra | Salida generada |
-|---|---|---|---|
-| **1** | `examples/ejemplo1_analisis_ventas.arc` | **Pipeline ETL en CSV**: Carga boletos aéreos, limpia nulos (`sanar`), purifica compras inválidas, calcula totales (`transmutar`), agrupa por destino (`destilar`) y exporta a CSV. | `salidas/resumen_ventas_ciudad.csv` |
-| **2** | `examples/ejemplo2_rendimiento_estudiantil.arc` | **Filtros Académicos en CSV**: Descarta nulos, exige asistencia $\ge 75\%$, calcula promedios y agrupa por carrera universitaria. | `salidas/resumen_estudiantes.csv` |
-| **3** | `examples/ejemplo3_calidad_aire.arc` | **Imputación Ambiental en CSV**: Rellena valores faltantes de PM10 con 50, filtra lecturas positivas y resume métricas por estación de monitoreo. | `salidas/resumen_calidad_aire.csv` |
-| **4** | `examples/ejemplo4_compendios_recetas.arc` | **Compendios y Librerías Modulares**: Uso de `usar compendio matematicas;` y `usar compendio estadistica;`, invocando recetas externas y números pseudoaleatorios. | `salidas/ventas_con_librerias_propias.csv` |
-| **5** | `examples/ejemplo5_caso_estudio_final.arc` | **Caso Integral de Machine Learning y Gráficos**: Pipeline completo con Regresión Lineal, KNN, K-Means, matrices y 4 gráficos estadísticos PNG. | 4 imágenes `.png` y resumen CSV/JSON |
-| **6** | `examples/ejemplo6_analisis_vuelos_json.arc` | **Analítica Multiformato JSON**: Lectura nativa de archivos JSON (`datos/vuelos.json`), cálculo de retrasos por aerolínea y gráfico de barras PNG. | `salidas/5_grafica_retraso_aerolineas.png` y JSON exportado |
-| **7** | `examples/ejemplo7_casos_profesor.arc` | **Los 5 Ejercicios del Tablero**: Factorial (5 a 100), Sigmoide real calculada, Perceptrón XOR, EDA de Excel (`Data.xlsx`) y filtro funcional de Primos. | `salidas/6_grafica_sigmoide_tendencia.png`, `8_perdida_xor.png`, CSVs |
-| **8** | `examples/ejemplo8_control_y_listas.arc` | **Fundamentos de Programación**: Asignación de variables, condicionales `si/sino`, bucle `mientras` con acumulador y manejo de listas (`Arreglo`). | Impresión clara en consola |
-| **9** | `examples/ejemplo9_estructuras_funcionales.arc` | **Programación Funcional y Matrices**: Transformación con `mapear`, `filtrar` y `reducir`, y álgebra lineal (suma y producto de matrices $2 \times 2$). | Impresión de colecciones y matrices |
+### 1. Variables y Operaciones Básicas
+**`examples/valido_asignaciones.arc`**
+* **Qué hace**: Asignación de enteros, decimales, textos, booleanos y cálculos aritméticos con precedencia.
+* **Comando**:
+  ```bash
+  python3 src/main.py examples/valido_asignaciones.arc
+  ```
+* **Qué observar**: El resultado final `total_con_descuento` da `212.5`.
+
+### 2. Decisiones, Bucles y Listas
+**`examples/ejemplo8_control_y_listas.arc`**
+* **Qué hace**: Demuestra condicionales `si/sino`, bucle `mientras` con acumulador, y recorrido de listas con `para`.
+* **Comando**:
+  ```bash
+  python3 src/main.py examples/ejemplo8_control_y_listas.arc
+  ```
+* **Qué observar**: Imprime "Hola, Arcanum", la evaluación de nota "Aprobado", y el acumulado `15` ($1+2+3+4+5$).
+
+### 3. Manejo de Tablas en Código y Recetas
+**`examples/ejemplo11_tablas_y_recetas.arc`**
+* **Qué hace**: Construye una tabla en memoria con `tabla(...)` sin necesidad de archivos externos, filtra con `purificar`, calcula con `transmutar`, agrupa con `destilar` y exporta a CSV.
+* **Comando**:
+  ```bash
+  python3 src/main.py examples/ejemplo11_tablas_y_recetas.arc
+  ```
+* **Qué observar**: Muestra la tabla filtrada y genera `salidas/ejemplo11_resumen.csv`.
+
+### 4. Los Ejercicios del Profesor (Factorial, Excel y Primos)
+**`examples/ejemplo7_casos_profesor.arc`**
+* **Qué hace**: 
+  1. Receta factorial con bucle `mientras` ($5! = 120$, $10! = 3,628,800$).
+  2. Lectura y análisis exploratorio (EDA) de hoja de cálculo Excel (`datos/Data.xlsx`) exportando gráfica a `salidas/7_eda_pasajeros_excel.png`.
+  3. Filtro funcional de números primos del 2 al 30 usando `filtrar(rango(2, 31), "es_primo")`.
+* **Comando**:
+  ```bash
+  python3 src/main.py examples/ejemplo7_casos_profesor.arc
+  ```
 
 ---
 
-## 4. Parámetros Avanzados de la Terminal
+## 4. Otros Casos de Negocio y Datos
 
-### Inspeccionar el Árbol de Análisis Sintáctico (CST/AST de ANTLR)
-Usa `--arbol` para imprimir en consola cómo ANTLR analizó la estructura jerárquica del código:
+| Ejemplo | Descripción | Comando |
+|---|---|---|
+| **Ejemplo 1** | ETL de ventas de boletos aéreos CSV (limpieza de nulos, subtotales y agrupación por destino). | `python3 src/main.py examples/ejemplo1_analisis_ventas.arc` |
+| **Ejemplo 2** | Rendimiento académico estudiantil (filtro de asistencia $\ge 75\%$ y promedios por carrera). | `python3 src/main.py examples/ejemplo2_rendimiento_estudiantil.arc` |
+| **Ejemplo 3** | Monitoreo ambiental de calidad del aire (imputación con `sanar` y métricas PM10 por estación). | `python3 src/main.py examples/ejemplo3_calidad_aire.arc` |
+| **Ejemplo 4** | Compendios y librerías reutilizables (`usar compendio matematicas;` y `estadistica;`). | `python3 src/main.py examples/ejemplo4_compendios_recetas.arc` |
+| **Ejemplo 5** | Caso de estudio integral multiformato (CSV + JSON, matrices y 4 gráficas PNG). | `python3 src/main.py examples/ejemplo5_caso_estudio_final.arc` |
+| **Ejemplo 6** | Analítica de vuelos en formato nativo **JSON** (`datos/vuelos.json`) con gráfica de barras. | `python3 src/main.py examples/ejemplo6_analisis_vuelos_json.arc` |
+| **Ejemplo 9** | Programación funcional (`mapear`, `filtrar`, `reducir`) y matrices numéricas. | `python3 src/main.py examples/ejemplo9_estructuras_funcionales.arc` |
+
+---
+
+## 5. Parámetros Avanzados
+
+### Inspeccionar el Árbol Sintáctico (AST / CST de ANTLR)
 ```bash
-python3 src/main.py examples/ejemplo8_control_y_listas.arc --arbol
+python3 src/main.py examples/valido_asignaciones.arc --arbol
 ```
 
-### Modificar el Límite de Seguridad de Iteraciones
-Por defecto, el bucle `mientras` se detiene a las 10,000 iteraciones para prevenir ciclos infinitos. Puedes ajustar este umbral:
+### Configurar Límite de Iteraciones
 ```bash
 python3 src/main.py examples/ejemplo8_control_y_listas.arc --max-iteraciones 20000
 ```

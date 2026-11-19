@@ -4,12 +4,10 @@ Entorno: macOS; Python 3.15.2; ANTLR runtime 4.13.2
 Pruebas ejecutadas desde una extracción limpia del ZIP.
 
 python -m pytest -q
-........................................................................ [ 88%]
-.........                                                                [100%]
-81 passed in 2.13s
+................................................................         [100%]
+64 passed in 0.84s
 
 python scripts/verificar_ejemplos.py
-OK ejemplo10_ml_paso_a_paso.arc
 OK ejemplo11_tablas_y_recetas.arc
 OK ejemplo1_analisis_ventas.arc
 OK ejemplo2_rendimiento_estudiantil.arc
@@ -32,9 +30,10 @@ OK valido_carga_seleccion.arc
 OK valido_completo.arc
 OK valido_filtro_avanzado.arc
 
-22 ejemplos revisados; 0 fallos inesperados
+21 ejemplos revisados; 0 fallos inesperados
 
 Opción --arbol: comprobada.
-Código de las 13 secciones prácticas del manual: ejecutado correctamente.
-Manual Word: 24 páginas renderizadas e inspeccionadas; sin recortes ni desbordamientos.
+Guía breve: ejecutados todos los bloques de código de sus dos secciones prácticas; resultados comprobados.
+Manual Word: 4 páginas renderizadas e inspeccionadas; sin recortes ni desbordamientos.
 Los comandos Windows se documentaron, pero no se probaron en una sesión Windows.
+Actualización de documentación: implementación y ejemplos idénticos a la entrega que pasó las 64 pruebas y la verificación de 21 ejemplos.

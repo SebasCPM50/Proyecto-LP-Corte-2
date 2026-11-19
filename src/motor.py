@@ -109,39 +109,3 @@ class MotorDatos:
         """Crea una instancia de Arreglo para operaciones funcionales."""
         from estructuras.arreglo import Arreglo
         return Arreglo(elementos)
-
-    # =========================================================================
-    # Métodos de Machine Learning Artesanal (ML)
-    # =========================================================================
-
-    @staticmethod
-    def entrenar_regresion(x, y):
-        """Entrena un modelo de predicción continua (Regresión Lineal)."""
-        from ml.regresion import RegresionLineal
-        modelo = RegresionLineal()
-        return modelo.entrenar(x, y)
-
-    @staticmethod
-    def entrenar_knn(datos_x, etiquetas_y, k=3):
-        """Entrena un modelo de clasificación supervisada (K-Nearest Neighbors)."""
-        from ml.clasificacion import KNNClasificador
-        modelo = KNNClasificador(k=k)
-        return modelo.entrenar(datos_x, etiquetas_y)
-
-    @staticmethod
-    def agrupar_kmeans(pocion, columnas, k=2, nombre_columna="cluster"):
-        """Aplica agrupamiento no supervisado (K-Means) sobre una Poción."""
-        from ml.clustering import KMediasClustering
-        modelo = KMediasClustering(k=k)
-        return modelo.asignar_a_pocion(pocion, columnas, nombre_columna=nombre_columna)
-
-    @staticmethod
-    def entrenar_mlp(datos_x, etiquetas_y, n_oculta=2, epocas=3500, tasa=1.0):
-        """Entrena un Perceptrón Multicapa (MLP) para problemas no lineales como XOR."""
-        from ml.perceptron import PerceptronMulticapa
-        from ml.validacion import matriz
-        datos_x = matriz(datos_x)
-        n_ent = len(datos_x[0])
-        modelo = PerceptronMulticapa(n_entrada=n_ent, n_oculta=n_oculta, n_salida=1, tasa_aprendizaje=tasa, epocas=epocas)
-        return modelo.entrenar(datos_x, etiquetas_y)
-
